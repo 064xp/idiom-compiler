@@ -1,0 +1,21 @@
+.button {
+  background-color: #577da1;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 99px;
+  cursor: pointer;
+}
+
+.button img {
+  width: 50%;
+}
+
+.button:hover {
+  background-color: #34495e;
+}
+
+.button:active {
+  transform: scale(0.9);
+}

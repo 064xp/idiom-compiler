@@ -1,0 +1,19 @@
+.container {
+  background-color: var(--background-primary);
+  padding: 0.6em 1em;
+  display: flex;
+  align-items: center;
+  box-shadow: 0px 7px 18px -6px rgba(0, 0, 0, 0.69);
+  -webkit-box-shadow: 0px 7px 18px -6px rgba(0, 0, 0, 0.69);
+  -moz-box-shadow: 0px 7px 18px -6px rgba(0, 0, 0, 0.69);
+  position: relative;
+  z-index: 10;
+}
+
+.container button {
+  margin: 0 1em;
+}
+
+.container button:first-child {
+  margin-left: 0;
+}

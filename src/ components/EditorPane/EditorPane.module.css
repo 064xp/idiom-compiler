@@ -1,0 +1,20 @@
+.container {
+  display: flex;
+}
+
+.editor {
+  width: 50%;
+  border-right: 2px solid var(--background-primary);
+}
+
+.outputPanel {
+  width: 50%;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+}
+
+.placeholder {
+  font-size: 4em;
+  color: black;
+}

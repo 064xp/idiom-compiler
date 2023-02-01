@@ -1,18 +1,16 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
-import Editor from "@monaco-editor/react";
+import EditorPane from "./ components/EditorPane/EditorPane";
+import MainToolbar from "./ components/MainToolbar/MainToolbar";
 
 function App() {
   const [count, setCount] = useState(0);
 
   return (
     <div className="App">
-      <Editor
-        height="90vh"
-        defaultLanguage="javascript"
-        defaultValue="// some comment"
-      />
+      <MainToolbar />
+      <EditorPane />
     </div>
   );
 }
