@@ -19,3 +19,9 @@
 .button:active {
   transform: scale(0.9);
 }
+
+.fileInput {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}

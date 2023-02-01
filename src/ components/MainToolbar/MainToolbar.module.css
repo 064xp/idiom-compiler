@@ -10,8 +10,13 @@
   z-index: 10;
 }
 
-.container button {
+.container .mainButtons {
   margin: 0 1em;
+}
+
+.mainButtons {
+  position: relative;
+  z-index: 9;
 }
 
 .container button:first-child {
