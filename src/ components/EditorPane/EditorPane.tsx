@@ -2,7 +2,11 @@ import React from "react";
 import Editor from "@monaco-editor/react";
 import styles from "./EditorPane.module.css";
 
-const EditorPane = () => {
+interface IProps {
+  currentFile: EditorFile;
+}
+
+const EditorPane = ({ currentFile }: IProps) => {
   const options = {
     minimap: {
       enabled: false,
@@ -14,9 +18,10 @@ const EditorPane = () => {
         height="90vh"
         width="50vw"
         defaultLanguage="javascript"
-        defaultValue="// some comment"
         className={styles.editor}
         options={options}
+        path={currentFile?.name}
+        defaultValue={currentFile?.value || ""}
       />
       <div className={styles.outputPanel}>
         <p className={styles.placeholder}>Output</p>

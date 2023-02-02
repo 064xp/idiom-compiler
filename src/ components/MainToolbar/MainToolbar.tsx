@@ -10,7 +10,11 @@ interface HTMLInputEvent extends React.FormEvent<HTMLInputElement> {
   target: HTMLInputElement & EventTarget;
 }
 
-const MainToolbar = () => {
+interface IProps {
+  onFileOpen: (file: EditorFile) => void;
+}
+
+const MainToolbar = ({ onFileOpen }: IProps) => {
   const onFileInputChanged: React.FormEventHandler<HTMLInputElement> = (
     event: HTMLInputEvent
   ) => {
@@ -23,7 +27,12 @@ const MainToolbar = () => {
     const reader = new FileReader();
     reader.addEventListener("load", (event) => {
       if (!event.target) return;
-      console.log(event.target.result);
+
+      onFileOpen({
+        name: file.name,
+        value: event.target.result as string,
+        language: "ic",
+      });
     });
 
     reader.readAsText(file);
