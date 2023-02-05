@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import EditorPane from "../ components/EditorPane/EditorPane";
 import MainToolbar from "../ components/MainToolbar/MainToolbar";
+import TabBar from "../ components/TabBar/TabBar";
 
 const Editor = () => {
-  const [files, setFiles] = useState<OpenFiles>([]);
-
+  const [files, setFiles] = useState<OpenFiles>([
+    {
+      language: "icp",
+      name: "untitled.icp",
+      value: `declara texto asgina "Hola mundo!"
+muestra(texto)`,
+    },
+  ]);
   const [currentFile, setCurrentFile] = useState<number>(0);
+  const downloadRef = useRef<HTMLAnchorElement>(null);
 
   const onFileOpen = (file: EditorFile) => {
     setFiles([
@@ -20,14 +28,30 @@ const Editor = () => {
     setCurrentFile(files.length);
   };
 
+  const downloadCurrentFile = () => {
+    const file = files[currentFile];
+    const data = new Blob([file.value], { type: "text/plain" });
+    if (!downloadRef.current) return;
+
+    downloadRef.current.setAttribute("download", file.name);
+    downloadRef.current.href = URL.createObjectURL(data);
+    const event = new MouseEvent("click");
+    downloadRef.current.dispatchEvent(event);
+  };
+
   return (
     <div>
-      <button onClick={() => setCurrentFile(0)}>test</button>
-
-      <button onClick={() => setCurrentFile(1)}>hello world</button>
-
-      <MainToolbar onFileOpen={onFileOpen} />
+      <MainToolbar
+        onFileOpen={onFileOpen}
+        onDownloadClick={downloadCurrentFile}
+      />
+      <TabBar
+        files={files}
+        currentFile={currentFile}
+        setCurrentFile={setCurrentFile}
+      />
       <EditorPane currentFile={files[currentFile]} />
+      <a href="" ref={downloadRef}></a>
     </div>
   );
 };
