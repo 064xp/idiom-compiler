@@ -6,9 +6,13 @@ import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
 interface IProps {
   currentFile: EditorFile;
+  onEditorChange: (
+    value: string | undefined,
+    ev: monaco.editor.IModelContentChangedEvent
+  ) => void;
 }
 
-const EditorPane = ({ currentFile }: IProps) => {
+const EditorPane = ({ currentFile, onEditorChange }: IProps) => {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   const handleEditorDidMount = (
@@ -35,6 +39,7 @@ const EditorPane = ({ currentFile }: IProps) => {
         path={currentFile?.name}
         defaultValue={currentFile?.value || ""}
         onMount={handleEditorDidMount}
+        onChange={onEditorChange}
       />
       <div className={styles.outputPanel}>
         <p className={styles.placeholder}>Output</p>

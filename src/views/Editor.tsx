@@ -33,6 +33,14 @@ const Editor = () => {
     downloadRef.current.dispatchEvent(event);
   };
 
+  const onEditorChange = (value: string | undefined, ev: any) => {
+    if (!value) return;
+
+    const newFiles = [...files];
+    newFiles[currentFile].value = value;
+    setFiles(newFiles);
+  };
+
   return (
     <div>
       <MainToolbar
@@ -44,7 +52,10 @@ const Editor = () => {
         currentFile={currentFile}
         setCurrentFile={setCurrentFile}
       />
-      <EditorPane currentFile={files[currentFile]} />
+      <EditorPane
+        currentFile={files[currentFile]}
+        onEditorChange={onEditorChange}
+      />
       <a href="" ref={downloadRef}></a>
     </div>
   );
