@@ -17,6 +17,8 @@
   --background-primary: #111920;
   --background-secondary: #1d2b38;
   --background-accent: #192a56;
+  --background-accent-lighter: #1f366e;
+  --background-accent-darker: #121f3f;
 }
 
 body {

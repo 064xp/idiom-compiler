@@ -1,11 +1,13 @@
 .button {
-  background-color: #f5f6fa;
+  background-color: var(--background-accent-lighter);
   border: none;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 99px;
   cursor: pointer;
+  opacity: 0.8;
+  border: 1px solid var(--background-accent-darker);
 }
 
 .button img {
@@ -13,7 +15,11 @@
 }
 
 .button:hover {
-  background-color: #cacacd;
+  /* background-color: #cacacd; */
+  opacity: 1;
+  box-shadow: -1px -1px 30px 2px rgba(0, 0, 0, 0.64);
+  -webkit-box-shadow: -1px -1px 30px 2px rgba(0, 0, 0, 0.64);
+  -moz-box-shadow: -1px -1px 30px 2px rgba(0, 0, 0, 0.64);
 }
 
 .button:active {

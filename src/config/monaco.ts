@@ -22,12 +22,13 @@ export const tokensProvider = <languages.IMonarchLanguage>{
     "no",
     "pero",
     "repite",
-    "muestra",
     "es",
     "verdadero",
     "falso",
     "veces",
   ],
+
+  builtInFunctions: ["muestra"],
 
   operators: ["igual", "a", "asigna", "menor", "mayor", "que"],
 
@@ -56,6 +57,7 @@ export const tokensProvider = <languages.IMonarchLanguage>{
             "@keywords": "keyword",
             "@operators": "operator",
             "@arithmeticOperators": "arithmeticOperator",
+            "@builtInFunctions": "builtInFunctions",
             "@default": "identifier",
           },
         },
@@ -157,6 +159,7 @@ export const theme: editor.IStandaloneThemeData = {
   rules: [
     { token: "operator", foreground: "f5425d" },
     { token: "arithmeticOperator", foreground: "9b59b6" },
+    { token: "builtInFunctions", foreground: "2ecc71" },
   ],
   colors: {
     "editor.foreground": "#ffffff",
