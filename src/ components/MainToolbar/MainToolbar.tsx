@@ -12,9 +12,10 @@ interface HTMLInputEvent extends React.FormEvent<HTMLInputElement> {
 
 interface IProps {
   onFileOpen: (file: EditorFile) => void;
+  onDownloadClick: () => void;
 }
 
-const MainToolbar = ({ onFileOpen }: IProps) => {
+const MainToolbar = ({ onFileOpen, onDownloadClick }: IProps) => {
   const onFileInputChanged: React.FormEventHandler<HTMLInputElement> = (
     event: HTMLInputEvent
   ) => {
@@ -31,7 +32,7 @@ const MainToolbar = ({ onFileOpen }: IProps) => {
       onFileOpen({
         name: file.name,
         value: event.target.result as string,
-        language: "ic",
+        language: "icp",
       });
     });
 
@@ -53,7 +54,11 @@ const MainToolbar = ({ onFileOpen }: IProps) => {
           onChange: onFileInputChanged,
         }}
       />
-      <CircularButton icon={SaveIcon} className={styles.mainButtons} />
+      <CircularButton
+        icon={SaveIcon}
+        className={styles.mainButtons}
+        onClick={onDownloadClick}
+      />
     </div>
   );
 };

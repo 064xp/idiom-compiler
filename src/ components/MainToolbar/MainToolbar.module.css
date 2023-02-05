@@ -1,5 +1,5 @@
 .container {
-  background-color: var(--background-primary);
+  background-color: var(--background-accent);
   padding: 0.6em 1em;
   display: flex;
   align-items: center;

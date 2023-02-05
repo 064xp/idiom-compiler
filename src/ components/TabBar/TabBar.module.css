@@ -1,0 +1,20 @@
+.tabBar {
+  display: flex;
+  overflow-x: scroll;
+}
+
+.tab {
+  padding: 1em 3em;
+  border: none;
+  border-right: 3px solid black;
+  cursor: pointer;
+}
+
+.tabName {
+  font-size: 1.1em;
+}
+
+.selectedTab {
+  background-color: var(--background-primary);
+  font-weight: bold;
+}

@@ -1,5 +1,5 @@
 .button {
-  background-color: #577da1;
+  background-color: #f5f6fa;
   border: none;
   display: flex;
   justify-content: center;
@@ -13,7 +13,7 @@
 }
 
 .button:hover {
-  background-color: #34495e;
+  background-color: #cacacd;
 }
 
 .button:active {
@@ -24,4 +24,5 @@
   opacity: 0;
   position: absolute;
   z-index: -1;
+  width: 100%;
 }
