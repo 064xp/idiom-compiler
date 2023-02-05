@@ -1,27 +1,40 @@
-import React from "react";
-import Editor from "@monaco-editor/react";
+import React, { useRef } from "react";
+import Editor, { Monaco } from "@monaco-editor/react";
 import styles from "./EditorPane.module.css";
+import { options, tokensProvider, conf, theme } from "../../config/monaco";
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
 interface IProps {
   currentFile: EditorFile;
 }
 
 const EditorPane = ({ currentFile }: IProps) => {
-  const options = {
-    minimap: {
-      enabled: false,
-    },
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+
+  const handleEditorDidMount = (
+    editor: monaco.editor.IStandaloneCodeEditor,
+    monaco: Monaco
+  ) => {
+    editorRef.current = editor;
+
+    monaco.languages.register({ id: "icp" });
+    monaco.languages.setMonarchTokensProvider("icp", tokensProvider);
+    monaco.languages.setLanguageConfiguration("icp", conf);
+    monaco.editor.defineTheme("icpTheme", theme);
+    monaco.editor.setTheme("icpTheme");
   };
+
   return (
     <div className={styles.container}>
       <Editor
         height="90vh"
         width="50vw"
-        defaultLanguage="javascript"
+        defaultLanguage="icp"
         className={styles.editor}
         options={options}
         path={currentFile?.name}
         defaultValue={currentFile?.value || ""}
+        onMount={handleEditorDidMount}
       />
       <div className={styles.outputPanel}>
         <p className={styles.placeholder}>Output</p>

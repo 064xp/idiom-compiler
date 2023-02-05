@@ -2,16 +2,10 @@ import React, { useState, useRef } from "react";
 import EditorPane from "../ components/EditorPane/EditorPane";
 import MainToolbar from "../ components/MainToolbar/MainToolbar";
 import TabBar from "../ components/TabBar/TabBar";
+import initialProgram from "../config/initialProgram";
 
 const Editor = () => {
-  const [files, setFiles] = useState<OpenFiles>([
-    {
-      language: "icp",
-      name: "untitled.icp",
-      value: `declara texto asgina "Hola mundo!"
-muestra(texto)`,
-    },
-  ]);
+  const [files, setFiles] = useState<OpenFiles>([initialProgram]);
   const [currentFile, setCurrentFile] = useState<number>(0);
   const downloadRef = useRef<HTMLAnchorElement>(null);
 
