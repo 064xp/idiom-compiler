@@ -56,7 +56,7 @@ const Editor = () => {
         currentFile={files[currentFile]}
         onEditorChange={onEditorChange}
       />
-      <a href="" ref={downloadRef}></a>
+      <a href="" ref={downloadRef} style={{ display: "none" }}></a>
     </div>
   );
 };
