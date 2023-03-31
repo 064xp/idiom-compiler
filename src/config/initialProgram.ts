@@ -15,7 +15,7 @@ repite num3 veces:
 `;
 
 export default {
-  name: "untitled.icp",
-  language: "icp",
-  value: initialProgram.trim(),
+    name: "untitled.icp",
+    language: "icp",
+    value: initialProgram.trim(),
 };
