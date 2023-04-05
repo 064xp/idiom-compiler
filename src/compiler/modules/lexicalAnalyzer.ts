@@ -1,4 +1,24 @@
-const indentationChar = "\\t";
+type TokenType =
+    | "reserved"
+    | "indentationCharacter"
+    | "identifier"
+    | "comparisonOperator"
+    | "newline"
+    | "logicalOperator"
+    | "arithmeticOperator"
+    | "literal";
+
+type TokenPattern = {
+    type: TokenType;
+    regex: string;
+};
+
+export type Token = {
+    type: TokenType;
+    token: string;
+    row: number;
+    col: number;
+};
 
 // Must go from most specific to less specific
 export const reservedKeywords = [
@@ -13,20 +33,30 @@ export const reservedKeywords = [
     // loops
     "repite",
     "veces",
+    ":",
 ];
-
-const languageSymbols = [":"];
-
-const identifierPattern = "[A-Za-z_][\\w_]*";
-const whitespacePattern = "\\n+";
 
 const comparisonOperators = ["menor que", "mayor que", "igual que"];
 
-const logicalExpressions = ["y", "o"];
+const logicalOperators = ["y", "o"];
 
 const arithmeticOperators = ["mas", "menos", "entre", "por", "modulo", "[()]"];
 
 const literalPatterns = ["\\d+", '".*"', "'.*'"];
+
+const joinPatterns = (patterns: string[]): string =>
+    patterns.map((w) => `(?:${w})`).join("|");
+
+const tokenPatterns: TokenPattern[] = [
+    { type: "reserved", regex: joinPatterns(reservedKeywords) },
+    { type: "indentationCharacter", regex: "\\t" },
+    { type: "identifier", regex: "[A-Za-z_][\\w_]*" },
+    { type: "comparisonOperator", regex: joinPatterns(comparisonOperators) },
+    { type: "logicalOperator", regex: joinPatterns(logicalOperators) },
+    { type: "arithmeticOperator", regex: joinPatterns(arithmeticOperators) },
+    { type: "literal", regex: joinPatterns(literalPatterns) },
+    { type: "newline", regex: "\\n+" },
+];
 
 export class LexicalError extends Error {
     row: number;
@@ -42,31 +72,11 @@ export class LexicalError extends Error {
 export default class LexicalAnalyzer {
     #lexerRegex: string = "";
     #inputString: string = "";
-    #row: number = 0;
-    #col: number = 0;
+    #row: number = 1;
+    #col: number = 1;
 
     constructor(inputString: string) {
-        this.#buildRegex();
         this.#inputString = inputString;
-    }
-
-    #buildRegex() {
-        this.#lexerRegex += this.#addPatterns(literalPatterns);
-        this.#lexerRegex += this.#addPatterns(comparisonOperators);
-        this.#lexerRegex += this.#addPatterns(reservedKeywords);
-        this.#lexerRegex += this.#addPatterns(arithmeticOperators);
-        this.#lexerRegex += this.#addPatterns(languageSymbols);
-        this.#lexerRegex += this.#addPatterns([
-            indentationChar,
-            whitespacePattern,
-            identifierPattern,
-        ]);
-        this.#lexerRegex += this.#addPatterns(logicalExpressions, true);
-    }
-
-    #addPatterns(patterns: string[], last: boolean = false): string {
-        const lastChar = last ? "" : "|";
-        return patterns.map((w) => "(?:" + w + ")").join("|") + lastChar;
     }
 
     /**
@@ -74,36 +84,38 @@ export default class LexicalAnalyzer {
      * @returns Next token in the program input or null if end of program
      * @throws {LexicalError}
      */
-    getToken(): string | null {
+    getToken(): Token | null {
         if (this.#inputString.length === 0) return null;
 
-        const match = this.#inputString.match(this.#lexerRegex);
+        for (let { type, regex } of tokenPatterns) {
+            const match = this.#inputString.match(regex);
+            if (match === null || match.index !== 0) continue;
 
-        if (match == null || match.index !== 0) {
-            console.log(match);
-            throw new LexicalError(
-                "Valid token not found",
-                this.#row,
-                this.#col
-            );
+            const token = match[0];
+            this.#inputString = this.#inputString.substring(token.length);
+
+            // Ammount of chars to remove from the beginning
+            // Length of token + following spaces
+            const columnDelta = token.length + this.removeLeadingSpace();
+
+            const tokenReturn = {
+                token,
+                type,
+                row: this.#row,
+                col: this.#col,
+            };
+
+            if (token == "\n") {
+                this.#row++;
+                this.#col = 1;
+            } else {
+                this.#col += columnDelta;
+            }
+
+            return tokenReturn;
         }
 
-        const token = match[0];
-        this.#inputString = this.#inputString.substring(token.length);
-
-        // Ammount of chars to remove from the beginning
-        // Length of token + following spaces
-        const columnDelta = token.length + this.removeLeadingSpace();
-
-        if (token == "\n") {
-            this.#row++;
-            this.#col = 0;
-        } else {
-            this.#col += columnDelta;
-        }
-
-        // console.log(this.#inputString);
-        return token;
+        throw new LexicalError("Valid token not found", this.#row, this.#col);
     }
 
     /**
