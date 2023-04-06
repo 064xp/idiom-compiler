@@ -1,4 +1,4 @@
-type TokenType =
+export type TokenType =
     | "reserved"
     | "indentationCharacter"
     | "identifier"
