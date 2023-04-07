@@ -23,7 +23,6 @@ const raiseSyntaxError = (
     event: TokenEvent,
     message: string
 ) => {
-    console.log(event);
     throw new SyntaxError(message, event.row, event.col);
 };
 
@@ -120,9 +119,6 @@ const ProgramMachine = createMachine({
     schema: {
         context: {},
         events: {} as TokenEvent,
-    },
-    context: {
-        errorMessage: "",
     },
     states: {
         start: {

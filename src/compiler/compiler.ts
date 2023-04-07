@@ -11,9 +11,11 @@ const compile = (input: string): string => {
     let token: Token | null;
 
     try {
-        while ((token = lexer.getToken())) {
+        while (true) {
+            token = lexer.getToken();
             // console.log(token);
             syntaxAnalyzer.parseToken(token);
+            if (token === null) break;
         }
     } catch (e) {
         if (e instanceof LexicalError) {

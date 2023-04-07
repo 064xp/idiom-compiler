@@ -15,6 +15,7 @@ export class SyntaxError extends Error {
 
 export default class SyntaxAnalyzer {
     #service;
+    #lastToken: Token | undefined;
 
     constructor() {
         this.#service = interpret(ProgramMachine);
@@ -22,7 +23,20 @@ export default class SyntaxAnalyzer {
         console.log("init", this.#service.state);
     }
 
-    parseToken(token: Token) {
+    parseToken(token: Token | null) {
+        if (token === null) {
+            if (!this.#service.getSnapshot().done) {
+                throw new SyntaxError(
+                    "Incomplete statement",
+                    this.#lastToken?.row as number,
+                    this.#lastToken?.col as number
+                );
+            }
+            return;
+        }
+
+        this.#lastToken = token;
+
         const obj = {
             type: token.token,
             tokenType: token.type,
@@ -31,6 +45,7 @@ export default class SyntaxAnalyzer {
         };
 
         this.#service.send(obj);
-        console.log(this.#service.state);
+        console.log(this.#service.getSnapshot());
+        return;
     }
 }
