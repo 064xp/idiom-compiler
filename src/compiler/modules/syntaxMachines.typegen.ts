@@ -23,7 +23,6 @@ export interface Typegen0 {
         | "declaration.expectIdentifier"
         | "declaration.expectOperator"
         | "declaration.expectValue"
-        | "declaration.syntaxError"
         | "start"
         | {
               declaration?:
@@ -31,8 +30,7 @@ export interface Typegen0 {
                   | "expectAsigna"
                   | "expectIdentifier"
                   | "expectOperator"
-                  | "expectValue"
-                  | "syntaxError";
+                  | "expectValue";
           };
     tags: never;
 }

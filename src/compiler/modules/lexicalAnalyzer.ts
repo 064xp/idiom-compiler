@@ -50,12 +50,12 @@ const joinPatterns = (patterns: string[]): string =>
 const tokenPatterns: TokenPattern[] = [
     { type: "reserved", regex: joinPatterns(reservedKeywords) },
     { type: "indentationCharacter", regex: "\\t" },
-    { type: "identifier", regex: "[A-Za-z_][\\w_]*" },
     { type: "comparisonOperator", regex: joinPatterns(comparisonOperators) },
     { type: "logicalOperator", regex: joinPatterns(logicalOperators) },
     { type: "arithmeticOperator", regex: joinPatterns(arithmeticOperators) },
     { type: "literal", regex: joinPatterns(literalPatterns) },
     { type: "newline", regex: "\\n+" },
+    { type: "identifier", regex: "[A-Za-z_][\\w_]*" },
 ];
 
 export class LexicalError extends Error {

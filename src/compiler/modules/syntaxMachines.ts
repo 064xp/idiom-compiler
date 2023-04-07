@@ -1,6 +1,6 @@
 import { BaseActionObject, StateNodeConfig, createMachine } from "xstate";
 import { TokenType } from "./lexicalAnalyzer";
-import { sendParent } from "xstate/lib/actions";
+import { SyntaxError } from "./syntacticAnalyzer";
 
 type TokenEvent = {
     type: string;
@@ -9,7 +9,23 @@ type TokenEvent = {
     col: number;
 };
 
-type SyntaxMachine = StateNodeConfig<{}, any, TokenEvent, BaseActionObject>;
+type SyntaxContext = {};
+
+type SyntaxMachine = StateNodeConfig<
+    SyntaxContext,
+    any,
+    TokenEvent,
+    BaseActionObject
+>;
+
+const raiseSyntaxError = (
+    context: SyntaxContext,
+    event: TokenEvent,
+    message: string
+) => {
+    console.log(event);
+    throw new SyntaxError(message, event.row, event.col);
+};
 
 const declarationMachine: SyntaxMachine = {
     id: "declaration",
@@ -20,12 +36,19 @@ const declarationMachine: SyntaxMachine = {
                 {
                     event: "*",
                     target: "expectAsigna",
-                    cond: (context: {}, event: TokenEvent) =>
-                        event.tokenType === "identifier",
+                    cond: (context: {}, event: TokenEvent) => {
+                        console.log(event);
+                        return event.tokenType === "identifier";
+                    },
                 },
                 {
                     event: "*",
-                    target: "syntaxError",
+                    actions: (c, e) =>
+                        raiseSyntaxError(
+                            c,
+                            e,
+                            `Se esperaba un identificador, se obtuvo ${e.type}`
+                        ),
                 },
             ],
         },
@@ -37,7 +60,12 @@ const declarationMachine: SyntaxMachine = {
                 },
                 {
                     event: "*",
-                    target: "syntaxError",
+                    actions: (c, e) =>
+                        raiseSyntaxError(
+                            c,
+                            e,
+                            `Se esperaba un 'asigna', se obtuvo ${e.type}`
+                        ),
                 },
             ],
         },
@@ -53,7 +81,12 @@ const declarationMachine: SyntaxMachine = {
                 },
                 {
                     event: "*",
-                    target: "syntaxError",
+                    actions: (c, e) =>
+                        raiseSyntaxError(
+                            c,
+                            e,
+                            `Se esperaba un identificador o una literal, se obtuvo ${e.type}`
+                        ),
                 },
             ],
         },
@@ -75,11 +108,10 @@ const declarationMachine: SyntaxMachine = {
         done: {
             type: "final",
         },
-        syntaxError: {
-            type: "final",
-        },
     },
 };
+
+const conditionalMachine: SyntaxMachine = {};
 
 const ProgramMachine = createMachine({
     id: "program",
@@ -89,12 +121,24 @@ const ProgramMachine = createMachine({
         context: {},
         events: {} as TokenEvent,
     },
+    context: {
+        errorMessage: "",
+    },
     states: {
         start: {
             on: [
                 {
                     event: "declara",
                     target: "declaration",
+                },
+                {
+                    event: "*",
+                    actions: (c: SyntaxContext, e: TokenEvent) =>
+                        raiseSyntaxError(
+                            c,
+                            e,
+                            "Se esperaba un identificador o una literal"
+                        ),
                 },
             ],
         },
