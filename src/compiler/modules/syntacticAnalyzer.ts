@@ -1,6 +1,6 @@
 import { interpret } from "xstate";
 import { Token } from "./lexicalAnalyzer";
-import ProgramMachine from "./syntaxMachines";
+import ProgramMachine from "./syntaxMachines/programMachine";
 
 export class SyntaxError extends Error {
     row: number;
@@ -18,25 +18,13 @@ export default class SyntaxAnalyzer {
     #lastToken: Token | undefined;
 
     constructor() {
+        //@ts-ignore
         this.#service = interpret(ProgramMachine);
         this.#service.start();
-        console.log("init", this.#service.state);
     }
 
-    parseToken(token: Token | null) {
-        if (token === null) {
-            if (!this.#service.getSnapshot().done) {
-                throw new SyntaxError(
-                    "Incomplete statement",
-                    this.#lastToken?.row as number,
-                    this.#lastToken?.col as number
-                );
-            }
-            return;
-        }
-
+    parseToken(token: Token) {
         this.#lastToken = token;
-
         const obj = {
             type: token.token,
             tokenType: token.type,
@@ -45,7 +33,44 @@ export default class SyntaxAnalyzer {
         };
 
         this.#service.send(obj);
-        console.log(this.#service.getSnapshot());
-        return;
+
+        // DEBUG:
+        this.#printCurrentState();
+
+        if (token.type === "eof") {
+            // If EOF reached and state machine is not in a final state,
+            // throw error
+            const ss = this.#service.getSnapshot();
+            if (!ss.done && ss.value !== "start") {
+                throw new SyntaxError(
+                    "Incomplete statement",
+                    this.#lastToken?.row as number,
+                    this.#lastToken?.col as number
+                );
+            }
+
+            console.log("Analisis sintáctico exitoso!");
+        }
+
+        this.#lastToken = token;
+    }
+
+    /**
+     * @summary Print current state of syntax state
+     * machine, including state of children
+     */
+    #printCurrentState() {
+        const ss = this.#service.getSnapshot();
+        const children = ss.children;
+        const childkeys = Object.keys(children);
+
+        let currentState: string = ("<MachineState> " + ss.value) as string;
+
+        childkeys.forEach((k) => {
+            //@ts-ignore
+            currentState += ` > ${children[k]._state.value}`;
+        });
+
+        console.log(currentState);
     }
 }

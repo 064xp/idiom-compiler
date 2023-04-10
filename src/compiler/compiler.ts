@@ -8,14 +8,15 @@ const compile = (input: string): string => {
     const lexer = new LexicalAnalyzer(input);
     const syntaxAnalyzer = new SyntaxAnalyzer();
 
-    let token: Token | null;
+    let token: Token;
 
     try {
         while (true) {
             token = lexer.getToken();
-            // console.log(token);
+
+            console.log(`parsing token: ${token.token} (${token.type})`);
             syntaxAnalyzer.parseToken(token);
-            if (token === null) break;
+            if (token.type === "eof") break;
         }
     } catch (e) {
         if (e instanceof LexicalError) {
@@ -33,7 +34,7 @@ const compile = (input: string): string => {
 };
 
 export const compileTest = () => {
-    const p = "declara mas";
+    const p = "declara abd asigna x mas 22";
     //     const p = `declara texto asigna "Hola Mundo!"
     // declara num1 asigna 2
     // declara num2 asigna 5

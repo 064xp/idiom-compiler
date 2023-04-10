@@ -6,7 +6,8 @@ export type TokenType =
     | "newline"
     | "logicalOperator"
     | "arithmeticOperator"
-    | "literal";
+    | "literal"
+    | "eof";
 
 type TokenPattern = {
     type: TokenType;
@@ -26,13 +27,13 @@ export const reservedKeywords = [
     "si no pero",
     "si no",
     "si",
-    "entonces",
+    "entonces\b",
     // Declaration, assignment
     "declara",
-    "asigna",
+    "asigna\b",
     // loops
-    "repite",
-    "veces",
+    "repite\b",
+    "veces\b",
     ":",
 ];
 
@@ -70,7 +71,6 @@ export class LexicalError extends Error {
 }
 
 export default class LexicalAnalyzer {
-    #lexerRegex: string = "";
     #inputString: string = "";
     #row: number = 1;
     #col: number = 1;
@@ -84,8 +84,13 @@ export default class LexicalAnalyzer {
      * @returns Next token in the program input or null if end of program
      * @throws {LexicalError}
      */
-    getToken(): Token | null {
-        if (this.#inputString.length === 0) return null;
+    getToken(): Token {
+        if (this.#inputString.length === 0)
+            return {
+                token: "EOF", type: "eof",
+                col: this.#col,
+                row: this.#row,
+            };
 
         for (let { type, regex } of tokenPatterns) {
             const match = this.#inputString.match(regex);
