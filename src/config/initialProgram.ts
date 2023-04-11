@@ -9,9 +9,11 @@ si num1 es mayor que num2 entonces
 	num3 asigna num1 mas num2
 si no entonces
 	num3 asigna num1 por num2
+fin
 
-repite num3 veces:
+repite num3 veces
 	muestra(texto)
+fin
 `;
 
 export default {

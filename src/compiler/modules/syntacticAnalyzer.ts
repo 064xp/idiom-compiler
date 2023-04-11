@@ -62,15 +62,27 @@ export default class SyntaxAnalyzer {
     #printCurrentState() {
         const ss = this.#service.getSnapshot();
         const children = ss.children;
-        const childkeys = Object.keys(children);
 
         let currentState: string = ("<MachineState> " + ss.value) as string;
 
-        childkeys.forEach((k) => {
-            //@ts-ignore
-            currentState += ` > ${children[k]._state.value}`;
-        });
+        currentState += " > " + this.#getStateValues(children).join(" > ");
+        console.log(`%c${currentState}`, "color: #27ae60");
+    }
 
-        console.log(currentState);
+    /**
+        * @summary for debug purposes only. 
+        * Recursively gets the state of the children of all machines
+    */
+    #getStateValues(children: any): string[] {
+        const values: string[] = [];
+
+        for (const key in children) {
+            const childState = children[key]._state;
+            values.push(childState.value);
+
+            const childValues = this.#getStateValues(childState.children);
+            values.push(...childValues);
+        }
+        return values;
     }
 }

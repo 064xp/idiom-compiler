@@ -114,7 +114,7 @@ export default class LexicalAnalyzer {
 
             // Ammount of chars to remove from the beginning
             // Length of token + following spaces
-            const columnDelta = token.length + this.removeLeadingSpace();
+            const columnDelta = token.length + this.#removeLeadingSpace();
 
             const tokenReturn = {
                 token,
@@ -133,15 +133,28 @@ export default class LexicalAnalyzer {
             return tokenReturn;
         }
 
-        throw new LexicalError("Valid token not found", this.#row, this.#col);
+
+        const unknownToken = this.#getFirstWord(this.#inputString);
+        throw new LexicalError(`Token no esperado: "${unknownToken}"`, this.#row, this.#col);
+    }
+
+    #getFirstWord = (str: string): string => {
+        str = str.trim();
+        const spaceIndex = str.indexOf(' ');
+
+        if (spaceIndex === -1)
+            return str;
+
+        // Otherwise, return the substring up to the first space character
+        return str.slice(0, spaceIndex).trim();
     }
 
     /**
      * @summary Removes leading spaces from the input string
      * @returns {number} ammount of spaces removed
      */
-    removeLeadingSpace(): number {
-        let p = / */;
+    #removeLeadingSpace(): number {
+        let p = /[\t ]*/;
 
         const match = this.#inputString.match(p);
         if (match === null || match.index !== 0) return 0;

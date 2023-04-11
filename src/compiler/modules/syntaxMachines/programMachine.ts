@@ -1,7 +1,9 @@
 import { BaseActionObject, StateNodeConfig, createMachine } from "xstate";
 import { Token, TokenType } from "../lexicalAnalyzer";
 import { SyntaxError } from "../syntacticAnalyzer";
+
 import DeclarationMachine from "./declaration";
+import LoopMachine from "./loop";
 
 export type TokenEvent = {
     type: string;
@@ -20,7 +22,7 @@ export type SyntaxMachine = StateNodeConfig<
 >;
 
 export const raiseSyntaxError = (
-    context: SyntaxContext,
+    _: SyntaxContext,
     event: TokenEvent,
     message: string
 ) => {
@@ -39,9 +41,12 @@ const ProgramMachine = createMachine({
         start: {
             on: {
                 declara: "declaration",
+                "\n":{},
+                repite: "loop",
+                fin: {},
                 "*": [
                     {
-                        target: "done",
+                        // ignore EOFs
                         cond: (_, event: TokenEvent) =>
                             event.tokenType === "eof",
                     },
@@ -50,7 +55,7 @@ const ProgramMachine = createMachine({
                             raiseSyntaxError(
                                 c,
                                 e,
-                                "Se esperaba un identificador o una literal"
+                                "Error, incompleto"
                             ),
                     },
                 ],
@@ -62,6 +67,13 @@ const ProgramMachine = createMachine({
                 autoForward: true,
                 onDone: "start",
             },
+        },
+        loop: {
+            invoke: {
+                src: LoopMachine,
+                autoForward: true,
+                onDone: "start"
+            }
         },
         done: {
             type: "final",
