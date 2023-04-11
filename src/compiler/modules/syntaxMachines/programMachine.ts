@@ -1,11 +1,7 @@
-import {
-    BaseActionObject,
-    StateNodeConfig,
-    createMachine,
-    sendParent,
-} from "xstate";
-import { Token, TokenType } from "../lexicalAnalyzer";
+import { createMachine } from "xstate";
+import { TokenType } from "../lexicalAnalyzer";
 import { SyntaxError } from "../syntacticAnalyzer";
+import ConditionalMachine from "./conditional";
 
 import DeclarationMachine from "./declaration";
 import LoopMachine from "./loop";
@@ -23,43 +19,27 @@ export type ChangeEvent = {
     state: string;
 };
 
-export type SyntaxContext = {};
-
-export type SyntaxMachine = StateNodeConfig<
-    SyntaxContext,
-    any,
-    TokenEvent,
-    BaseActionObject
->;
-
-export const raiseSyntaxError = (
-    _: SyntaxContext,
-    event: TokenEvent,
-    message: string
-) => {
-    throw new SyntaxError(message, event.row, event.col);
+type ProgramMachineContext = {
+    isChild: boolean;
 };
 
-function sendParentIfNecessary(context, event, meta) {
-    if (!event) return;
+export const raiseSyntaxError = (
+    _: any,
+    event: TokenEvent,
+    message: string,
+    showGot: boolean = true
+) => {
+    let msg = message;
 
-    const e = {
-        type: "CHILD_STATE_CHANGE",
-        data: {
-            state: "test",
-        },
-    };
-    const sp = sendParent(e)(context, event, meta);
-    console.log("sending to parent", e, sp);
-    // if (context.isChild) {
-    // }
-    return sp;
-}
+    if(showGot)
+        msg += `, se obtuvo ${JSON.stringify(event.type)}`
+    throw new SyntaxError(msg, event.row, event.col);
+};
 
 const childOnDone = [
     {
         target: "done",
-        cond: (c) => c.isChild,
+        cond: (c: ProgramMachineContext) => c.isChild,
     },
     {
         target: "start",
@@ -71,7 +51,7 @@ const ProgramMachine = createMachine({
     id: "program",
     initial: "start",
     schema: {
-        context: { isChild: false },
+        context: { isChild: false } as ProgramMachineContext,
         events: {} as TokenEvent,
     },
     context: { isChild: false },
@@ -81,6 +61,7 @@ const ProgramMachine = createMachine({
                 declara: "declaration",
                 "\n": {},
                 repite: "loop",
+                si: "conditional",
                 fin: {},
                 "*": [
                     {
@@ -89,8 +70,8 @@ const ProgramMachine = createMachine({
                             event.tokenType === "eof",
                     },
                     {
-                        actions: (c: SyntaxContext, e: TokenEvent) =>
-                            raiseSyntaxError(c, e, "Error, incompleto"),
+                        actions: (c: ProgramMachineContext, e: TokenEvent) =>
+                            raiseSyntaxError(c, e, "Error, incompleto", false),
                     },
                 ],
             },
@@ -105,6 +86,13 @@ const ProgramMachine = createMachine({
         loop: {
             invoke: {
                 src: LoopMachine,
+                autoForward: true,
+                onDone: childOnDone,
+            },
+        },
+        conditional: {
+            invoke: {
+                src: ConditionalMachine,
                 autoForward: true,
                 onDone: childOnDone,
             },

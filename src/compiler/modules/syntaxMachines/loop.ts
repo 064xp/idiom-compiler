@@ -51,7 +51,8 @@ const LoopMachine = createMachine({
                             raiseSyntaxError(
                                 c,
                                 e,
-                                `Palabra faltante "fin" para terminar el ciclo`
+                                `Palabra faltante "fin" para terminar el ciclo`,
+                                false
                             ),
                     },
                     {

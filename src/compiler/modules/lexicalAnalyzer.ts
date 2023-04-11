@@ -8,6 +8,7 @@ export type TokenType =
     | "arithmeticOperator"
     | "stringLiteral"
     | "numberLiteral"
+    | "booleanLiteral"
     | "eof";
 
 type TokenPattern = {
@@ -47,6 +48,8 @@ const logicalOperators = ["y", "o"];
 
 const arithmeticOperators = ["mas", "menos", "entre", "por", "modulo", "[()]"];
 
+const booleanLiteral = ["Verdadero", "Falso"];
+
 const stringLiteralPatterns = ['".*"', "'.*'"];
 const numberLiteralPatterns = ["\\d+"];
 
@@ -68,6 +71,7 @@ const tokenPatterns: TokenPattern[] = [
     { type: "arithmeticOperator", regex: joinPatterns(arithmeticOperators) },
     { type: "stringLiteral", regex: joinPatterns(stringLiteralPatterns) },
     { type: "numberLiteral", regex: joinPatterns(numberLiteralPatterns) },
+    { type: "booleanLiteral", regex: joinPatterns(booleanLiteral) },
     { type: "newline", regex: "\\n+" },
     { type: "identifier", regex: "[A-Za-z_][\\w_]*" },
 ];

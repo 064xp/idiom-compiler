@@ -23,7 +23,7 @@ const declarationMachine = createMachine({
                             raiseSyntaxError(
                                 c,
                                 e,
-                                `Se esperaba un identificador, se obtuvo ${e.type}`
+                                `Se esperaba un identificador`
                             ),
                     },
                 ],
@@ -43,7 +43,7 @@ const declarationMachine = createMachine({
                             raiseSyntaxError(
                                 c,
                                 e,
-                                `Se esperaba un 'asigna', se obtuvo ${e.type}`
+                                `Se esperaba un "asigna"`
                             ),
                     },
                 ],
@@ -66,7 +66,7 @@ const declarationMachine = createMachine({
                         raiseSyntaxError(
                             c,
                             e,
-                            `Se esperaba un identificador o una literal, se obtuvo ${e.type}`
+                            `Se esperaba un identificador o una literal`
                         ),
                 },
             ],
@@ -91,7 +91,7 @@ const declarationMachine = createMachine({
                             raiseSyntaxError(
                                 c,
                                 e,
-                                `Se esperaba un operador aritmético o fin de instrucción, se obtuvo ${e.type}`
+                                `Se esperaba un operador aritmético o fin de instrucción`
                             ),
                     },
                 ],
