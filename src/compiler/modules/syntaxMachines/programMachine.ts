@@ -1,4 +1,9 @@
-import { BaseActionObject, StateNodeConfig, createMachine } from "xstate";
+import {
+    BaseActionObject,
+    StateNodeConfig,
+    createMachine,
+    sendParent,
+} from "xstate";
 import { Token, TokenType } from "../lexicalAnalyzer";
 import { SyntaxError } from "../syntacticAnalyzer";
 
@@ -10,6 +15,12 @@ export type TokenEvent = {
     tokenType: TokenType;
     row: number;
     col: number;
+    state: string;
+};
+
+export type ChangeEvent = {
+    type: string;
+    state: string;
 };
 
 export type SyntaxContext = {};
@@ -29,19 +40,46 @@ export const raiseSyntaxError = (
     throw new SyntaxError(message, event.row, event.col);
 };
 
+function sendParentIfNecessary(context, event, meta) {
+    if (!event) return;
+
+    const e = {
+        type: "CHILD_STATE_CHANGE",
+        data: {
+            state: "test",
+        },
+    };
+    const sp = sendParent(e)(context, event, meta);
+    console.log("sending to parent", e, sp);
+    // if (context.isChild) {
+    // }
+    return sp;
+}
+
+const childOnDone = [
+    {
+        target: "done",
+        cond: (c) => c.isChild,
+    },
+    {
+        target: "start",
+    },
+];
+
 const ProgramMachine = createMachine({
     predictableActionArguments: true,
     id: "program",
     initial: "start",
     schema: {
-        context: {},
+        context: { isChild: false },
         events: {} as TokenEvent,
     },
+    context: { isChild: false },
     states: {
         start: {
             on: {
                 declara: "declaration",
-                "\n":{},
+                "\n": {},
                 repite: "loop",
                 fin: {},
                 "*": [
@@ -52,11 +90,7 @@ const ProgramMachine = createMachine({
                     },
                     {
                         actions: (c: SyntaxContext, e: TokenEvent) =>
-                            raiseSyntaxError(
-                                c,
-                                e,
-                                "Error, incompleto"
-                            ),
+                            raiseSyntaxError(c, e, "Error, incompleto"),
                     },
                 ],
             },
@@ -65,15 +99,15 @@ const ProgramMachine = createMachine({
             invoke: {
                 src: DeclarationMachine,
                 autoForward: true,
-                onDone: "start",
+                onDone: childOnDone,
             },
         },
         loop: {
             invoke: {
                 src: LoopMachine,
                 autoForward: true,
-                onDone: "start"
-            }
+                onDone: childOnDone,
+            },
         },
         done: {
             type: "final",

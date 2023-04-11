@@ -1,9 +1,5 @@
-import { createMachine } from "xstate";
-import ProgramMachine, {
-    TokenEvent,
-    raiseSyntaxError,
-    SyntaxContext,
-} from "./programMachine";
+import { createMachine, send } from "xstate";
+import ProgramMachine, { TokenEvent, raiseSyntaxError } from "./programMachine";
 
 const LoopMachine = createMachine({
     predictableActionArguments: true,
@@ -35,9 +31,18 @@ const LoopMachine = createMachine({
             invoke: {
                 src: () => ProgramMachine,
                 autoForward: true,
+                data: {
+                    isChild: true,
+                },
+                onDone: "expectInstrOrFin",
             },
+        },
+        expectInstrOrFin: {
             on: {
-                fin: "done",
+                fin: {
+                    target: "done",
+                },
+                "\n": {},
                 "*": [
                     {
                         cond: (_, event: TokenEvent) =>
@@ -48,6 +53,12 @@ const LoopMachine = createMachine({
                                 e,
                                 `Palabra faltante "fin" para terminar el ciclo`
                             ),
+                    },
+                    {
+                        target: "instructions",
+                        actions: send((_context, event) => ({
+                            ...event,
+                        })),
                     },
                 ],
             },
