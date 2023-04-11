@@ -5,6 +5,7 @@ import { useEffect } from "react";
 
 function App() {
     useEffect(() => {
+        console.log("----------------------------------");
         compileTest();
     }, []);
     return (

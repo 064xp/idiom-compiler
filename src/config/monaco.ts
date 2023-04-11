@@ -1,4 +1,5 @@
 import { editor, languages } from "monaco-editor/esm/vs/editor/editor.api";
+import { languageTokens } from "../compiler/modules/lexicalAnalyzer";
 
 export const options: editor.IStandaloneEditorConstructionOptions = {
   minimap: {
@@ -12,27 +13,32 @@ export const options: editor.IStandaloneEditorConstructionOptions = {
   cursorBlinking: "phase",
 };
 
+/**
+* @summary Takes a list of tokens separates them if they have spaces.
+* for example: ["menor que"] => ["menor", "que"]
+*/
+const splitTokens = (tokens: string[]): string[] => {
+    const outTokens: string[] = [];
+
+    tokens.forEach(t=>{
+        const sToken = t.split(" ");
+        outTokens.push(...sToken);
+    })
+    return outTokens;
+}
+
 export const tokensProvider = <languages.IMonarchLanguage>{
   defaultToken: "",
 
   keywords: [
-    "declara",
-    "entonces",
-    "si",
-    "no",
-    "pero",
-    "repite",
-    "es",
-    "verdadero",
-    "falso",
-    "veces",
+      ...splitTokens(languageTokens.reservedKeywords)
   ],
 
-  builtInFunctions: ["muestra"],
+  builtInFunctions: [...splitTokens(languageTokens.builtinFunctions)],
 
-  operators: ["igual", "a", "asigna", "menor", "mayor", "que"],
+  operators: [...splitTokens(languageTokens.comparisonOperators)],
 
-  arithmeticOperators: ["entre", "mas", "menos", "por", "modulo"],
+  arithmeticOperators: [...splitTokens(languageTokens.arithmeticOperators)],
 
   brackets: [
     { open: "{", close: "}", token: "delimiter.curly" },
