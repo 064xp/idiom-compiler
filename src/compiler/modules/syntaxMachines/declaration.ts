@@ -57,7 +57,8 @@ const declarationMachine = createMachine({
                     target: "expectOperator",
                     cond: (_: {}, event: TokenEvent) =>
                         event.tokenType === "identifier" ||
-                        event.tokenType === "literal",
+                        event.tokenType === "stringLiteral" ||
+                        event.tokenType === "numberLiteral",
                 },
                 {
                     event: "*",

@@ -6,7 +6,8 @@ export type TokenType =
     | "newline"
     | "logicalOperator"
     | "arithmeticOperator"
-    | "literal"
+    | "stringLiteral"
+    | "numberLiteral"
     | "eof";
 
 type TokenPattern = {
@@ -22,20 +23,23 @@ export type Token = {
 };
 
 // Must go from most specific to less specific
-export const reservedKeywords = [
+const reservedKeywords = [
     // Conditional
     "si no pero",
     "si no",
     "si",
-    "entonces\b",
+    "entonces",
     // Declaration, assignment
     "declara",
-    "asigna\b",
+    "asigna",
     // loops
-    "repite\b",
-    "veces\b",
-    ":",
+    "repite",
+    "veces",
+    "fin",
+    "es"
 ];
+
+const builtinFunctions = ["muestra"]
 
 const comparisonOperators = ["menor que", "mayor que", "igual que"];
 
@@ -43,18 +47,27 @@ const logicalOperators = ["y", "o"];
 
 const arithmeticOperators = ["mas", "menos", "entre", "por", "modulo", "[()]"];
 
-const literalPatterns = ["\\d+", '".*"', "'.*'"];
+const stringLiteralPatterns = ['".*"', "'.*'"];
+const numberLiteralPatterns = ["\\d+"];
+
+export const languageTokens = {
+    reservedKeywords,
+    comparisonOperators,
+    logicalOperators,
+    arithmeticOperators,
+    builtinFunctions
+}
 
 const joinPatterns = (patterns: string[]): string =>
     patterns.map((w) => `(?:${w})`).join("|");
 
 const tokenPatterns: TokenPattern[] = [
     { type: "reserved", regex: joinPatterns(reservedKeywords) },
-    { type: "indentationCharacter", regex: "\\t" },
     { type: "comparisonOperator", regex: joinPatterns(comparisonOperators) },
     { type: "logicalOperator", regex: joinPatterns(logicalOperators) },
     { type: "arithmeticOperator", regex: joinPatterns(arithmeticOperators) },
-    { type: "literal", regex: joinPatterns(literalPatterns) },
+    { type: "stringLiteral", regex: joinPatterns(stringLiteralPatterns) },
+    { type: "numberLiteral", regex: joinPatterns(numberLiteralPatterns) },
     { type: "newline", regex: "\\n+" },
     { type: "identifier", regex: "[A-Za-z_][\\w_]*" },
 ];
