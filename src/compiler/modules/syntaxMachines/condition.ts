@@ -1,9 +1,9 @@
 import { createMachine, sendParent } from "xstate";
 import { TokenEvent, raiseSyntaxError } from "./programMachine";
 
-export type ConditionFinalEvent = {
+export type FinalStateEvent = {
     type: string;
-    data: boolean;
+    isFinal: boolean;
 }
 
 const ConditionMachine = createMachine({
@@ -25,6 +25,7 @@ const ConditionMachine = createMachine({
                             event.tokenType === "stringLiteral" ||
                             event.tokenType === "numberLiteral" ||
                             event.tokenType === "booleanLiteral",
+                        actions: (c, e) => console.log("condStart, got", e)
                     },
                     {
                         actions: (_, event: TokenEvent) =>
@@ -38,8 +39,8 @@ const ConditionMachine = createMachine({
             },
         },
         MUX: {
-            entry: sendParent({ type: "CONDITION_FINAL", data: true }),
-            exit: sendParent({ type: "CONDITION_FINAL", data: false }),
+            entry: sendParent({ type: "CONDITION_FINAL", isFinal: true }),
+            exit: sendParent({ type: "CONDITION_FINAL", isFinal: false }),
             on: {
                 no: "expectCmpOp",
                 "*": [

@@ -13,7 +13,7 @@ const compile = (input: string): string => {
     while (true) {
         token = lexer.getToken();
 
-        console.log(`parsing token: ${token.token} (${token.type})`);
+        console.log(`parsing token: ${JSON.stringify(token.token)} (${token.type})`);
         syntaxAnalyzer.parseToken(token);
         if (token.type === "eof") break;
     }
@@ -46,11 +46,7 @@ export const compileTest = () => {
     //     fin
     //  fin`;
     const p = `
-    si x no menor que _troValor entonces
-        declara x asigna 10
-        si Verdadero entonces
-            declara asdf asigna 200
-        fin
+    repite 3 veces
     fin
     `
     compile(p);

@@ -1,4 +1,4 @@
-import { createMachine } from "xstate";
+import { createMachine, send, sendParent } from "xstate";
 import { TokenType } from "../lexicalAnalyzer";
 import { SyntaxError } from "../syntacticAnalyzer";
 import ConditionalMachine from "./conditional";
@@ -11,12 +11,7 @@ export type TokenEvent = {
     tokenType: TokenType;
     row: number;
     col: number;
-    state: string;
-};
-
-export type ChangeEvent = {
-    type: string;
-    state: string;
+    forwardedByChild: boolean;
 };
 
 type ProgramMachineContext = {
@@ -31,8 +26,7 @@ export const raiseSyntaxError = (
 ) => {
     let msg = message;
 
-    if(showGot)
-        msg += `, se obtuvo ${JSON.stringify(event.type)}`
+    if (showGot) msg += `, se obtuvo ${JSON.stringify(event.type)}`;
     throw new SyntaxError(msg, event.row, event.col);
 };
 
@@ -47,7 +41,7 @@ const childOnDone = [
 ];
 
 const ProgramMachine = createMachine({
-    predictableActionArguments: true,
+    // predictableActionArguments: true,
     id: "program",
     initial: "start",
     schema: {
@@ -57,12 +51,28 @@ const ProgramMachine = createMachine({
     context: { isChild: false },
     states: {
         start: {
+            entry: () => console.log("entered program start"),
             on: {
                 declara: "declaration",
                 "\n": {},
                 repite: "loop",
                 si: "conditional",
-                fin: {},
+                fin: [
+                    {
+                        // Forward "fin" to parent in case it we're in
+                        // an empty conditional or loop
+                        // Also check that we haven't already forwarded it
+                        cond: (c, e) => c.isChild && !e.forwardedByChild,
+                        actions: [
+                            (c, e) =>
+                                console.log("sending fin to parent", c, e),
+                            sendParent((_, e) => ({
+                                ...e,
+                                forwardedByChild: true,
+                            })),
+                        ],
+                    },
+                ],
                 "*": [
                     {
                         // ignore EOFs
@@ -71,12 +81,13 @@ const ProgramMachine = createMachine({
                     },
                     {
                         actions: (c: ProgramMachineContext, e: TokenEvent) =>
-                            raiseSyntaxError(c, e, "Error, incompleto", false),
+                            raiseSyntaxError(c, e, "Token no esperado"),
                     },
                 ],
             },
         },
         declaration: {
+            entry: () => console.log("entered program declaration"),
             invoke: {
                 src: DeclarationMachine,
                 autoForward: true,
@@ -84,6 +95,7 @@ const ProgramMachine = createMachine({
             },
         },
         loop: {
+            entry: () => console.log("entered program loop"),
             invoke: {
                 src: LoopMachine,
                 autoForward: true,
@@ -91,10 +103,33 @@ const ProgramMachine = createMachine({
             },
         },
         conditional: {
+            entry: () => console.log("entered program conditional"),
             invoke: {
                 src: ConditionalMachine,
-                autoForward: true,
                 onDone: childOnDone,
+                id: "conditionalMachine",
+                autoForward: true,
+            },
+            on: {
+                "*": [
+                    // Since conditional needs to look ahead to know if there's an
+                    // else or not, it forwards the last token to its parent.
+                    // Here we forward that token event to this machine's parent
+                    // if it has one and if the event is marked as forwarded
+                    {
+                        cond: (c: ProgramMachineContext, e: TokenEvent) => {
+                            const cond = e.forwardedByChild && c.isChild;
+
+                            console.log("got", e, "will forward?", cond, c);
+                            return cond;
+                        },
+
+                        actions: [
+                            (c, e, m) => console.log("sending to parent", e, c, m),
+                            sendParent((_, e) => e),
+                        ],
+                    },
+                ],
             },
         },
         done: {

@@ -72,7 +72,7 @@ const tokenPatterns: TokenPattern[] = [
     { type: "stringLiteral", regex: joinPatterns(stringLiteralPatterns) },
     { type: "numberLiteral", regex: joinPatterns(numberLiteralPatterns) },
     { type: "booleanLiteral", regex: joinPatterns(booleanLiteral) },
-    { type: "newline", regex: "\\n+" },
+    { type: "newline", regex: "\\n" },
     { type: "identifier", regex: "[A-Za-z_][\\w_]*" },
 ];
 

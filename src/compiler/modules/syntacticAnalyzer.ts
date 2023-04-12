@@ -1,6 +1,6 @@
 import { interpret } from "xstate";
 import { Token } from "./lexicalAnalyzer";
-import ProgramMachine from "./syntaxMachines/programMachine";
+import ProgramMachine, { TokenEvent } from "./syntaxMachines/programMachine";
 
 export class SyntaxError extends Error {
     row: number;
@@ -25,11 +25,12 @@ export default class SyntaxAnalyzer {
 
     parseToken(token: Token) {
         this.#lastToken = token;
-        const obj = {
+        const obj:TokenEvent = {
             type: token.token,
             tokenType: token.type,
             row: token.row,
             col: token.col,
+            forwardedByChild: false
         };
 
         this.#service.send(obj);
