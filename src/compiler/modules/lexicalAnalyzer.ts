@@ -37,10 +37,10 @@ const reservedKeywords = [
     "repite",
     "veces",
     "fin",
-    "es"
+    "es",
 ];
 
-const builtinFunctions = ["muestra"]
+const builtinFunctions = ["muestra"];
 
 const comparisonOperators = ["menor que", "mayor que", "igual que"];
 
@@ -50,7 +50,7 @@ const arithmeticOperators = ["mas", "menos", "entre", "por", "modulo", "[()]"];
 
 const booleanLiteral = ["Verdadero", "Falso"];
 
-const specialCharacters = [","]
+const specialCharacters = [","];
 
 const stringLiteralPatterns = ['".*"', "'.*'"];
 const numberLiteralPatterns = ["\\d+"];
@@ -60,8 +60,8 @@ export const languageTokens = {
     comparisonOperators,
     logicalOperators,
     arithmeticOperators,
-    builtinFunctions
-}
+    builtinFunctions,
+};
 
 const joinPatterns = (patterns: string[]): string =>
     patterns.map((w) => `(?:${w})`).join("|");
@@ -107,7 +107,8 @@ export default class LexicalAnalyzer {
     getToken(): Token {
         if (this.#inputString.length === 0)
             return {
-                token: "EOF", type: "eof",
+                token: "EOF",
+                type: "eof",
                 col: this.#col,
                 row: this.#row,
             };
@@ -140,21 +141,23 @@ export default class LexicalAnalyzer {
             return tokenReturn;
         }
 
-
         const unknownToken = this.#getFirstWord(this.#inputString);
-        throw new LexicalError(`Token no esperado: "${unknownToken}"`, this.#row, this.#col);
+        throw new LexicalError(
+            `Token no esperado: "${unknownToken}"`,
+            this.#row,
+            this.#col
+        );
     }
 
     #getFirstWord = (str: string): string => {
         str = str.trim();
-        const spaceIndex = str.indexOf(' ');
+        const spaceIndex = str.indexOf(" ");
 
-        if (spaceIndex === -1)
-            return str;
+        if (spaceIndex === -1) return str;
 
         // Otherwise, return the substring up to the first space character
         return str.slice(0, spaceIndex).trim();
-    }
+    };
 
     /**
      * @summary Removes leading spaces from the input string

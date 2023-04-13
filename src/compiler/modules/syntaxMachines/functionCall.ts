@@ -1,4 +1,4 @@
-import { createMachine, send } from "xstate";
+import { createMachine } from "xstate";
 import { TokenEvent, raiseSyntaxError } from "./programMachine";
 
 type FunctionCallContext = {

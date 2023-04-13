@@ -1,9 +1,9 @@
 import { assign, createMachine, send, sendParent } from "xstate";
 import { TokenType } from "../lexicalAnalyzer";
 import { SyntaxError } from "../syntacticAnalyzer";
+
 import AssignmentMachine from "./assignment";
 import ConditionalMachine from "./conditional";
-
 import DeclarationMachine from "./declaration";
 import FunctionCallMachine from "./functionCall";
 import LoopMachine from "./loop";

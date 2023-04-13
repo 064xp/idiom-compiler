@@ -1,5 +1,5 @@
 import { assign, createMachine } from "xstate";
-import { TokenEvent, raiseSyntaxError, SyntaxContext } from "./programMachine";
+import { TokenEvent, raiseSyntaxError } from "./programMachine";
 import AssignmentMachine from "./assignment";
 
 type DeclarationContext = {
@@ -23,14 +23,14 @@ const declarationMachine = createMachine({
                 "*": [
                     {
                         target: "expectAsigna",
-                        cond: (_: SyntaxContext, event: TokenEvent) =>
+                        cond: (_, event: TokenEvent) =>
                             event.tokenType === "identifier",
                         actions: assign({
                             identifier: (_, e: TokenEvent) => e.type,
                         }),
                     },
                     {
-                        actions: (c: SyntaxContext, e: TokenEvent) =>
+                        actions: (c, e: TokenEvent) =>
                             raiseSyntaxError(
                                 c,
                                 e,
@@ -46,12 +46,12 @@ const declarationMachine = createMachine({
                 "*": [
                     {
                         target: "done",
-                        cond: (_: SyntaxContext, event: TokenEvent) =>
+                        cond: (_, event: TokenEvent) =>
                             event.tokenType === "newline" ||
                             event.tokenType === "eof",
                     },
                     {
-                        actions: (c: SyntaxContext, e: TokenEvent) =>
+                        actions: (c, e: TokenEvent) =>
                             raiseSyntaxError(c, e, `Se esperaba un "asigna"`),
                     },
                 ],
