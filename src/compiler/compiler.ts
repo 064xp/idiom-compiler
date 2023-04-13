@@ -46,13 +46,14 @@ export const compileTest = () => {
     //     fin
     //  fin`;
     const p = `
-    si x entonces
-        si xx entonces
-            repite 3 veces
-                declara works
+    repite 3 veces
+        si x mayor que 10 entonces
+            declara a 
+        fin
+        si no pero xx entonces
+            declara b
         fin
     fin
-
     `
     compile(p);
 };

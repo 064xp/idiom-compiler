@@ -42,12 +42,7 @@ const ConditionalMachine = createMachine({
                     // condition is in final state
                     {
                         target: "expectInstructions",
-                        cond: (context, _) => {
-                            const cond = context.conditionInFinalState;
-
-                            console.log("got entonces, going to exInst?", cond);
-                            return cond;
-                        },
+                        cond: (context, _) => context.conditionInFinalState,
                     },
                     // If condition machine is not in final state
                     // forward "entonces" so that the corresponding state
@@ -60,11 +55,7 @@ const ConditionalMachine = createMachine({
                 ],
                 // forward anything that isn't "entonces" to condition machine
                 "*": {
-                    actions: [
-                        (c, e) =>
-                            console.log("forwarding to condtion machine", c, e),
-                        forwardTo("conditionMachine"),
-                    ],
+                    actions: forwardTo("conditionMachine"),
                 },
             },
         },
@@ -76,34 +67,15 @@ const ConditionalMachine = createMachine({
                     isChild: true,
                 },
                 onDone: "expectInstrOrFin",
-                // autoForward: true,
+                autoForward: true,
             },
 
             on: {
-                fin: {
-                    // When we get a "fin", if it comes from the child machine
-                    // it means we have an empty conditional statement
-                    cond: (_, e) => (e as TokenEvent).forwardedByChild,
-                    target: "expectElse",
-                    actions: [
-                        (_, e) => console.log("stopping"),
-                        stop("programSubMachine"),
-                    ],
-                },
-
                 "*": [
                     // Forward event to self if it was forwarded by child
                     {
-                        actions: [send((_, e) => e)],
+                        actions: send((_, e) => e),
                         cond: (_, e) => (e as TokenEvent).forwardedByChild,
-                    },
-                    // Forward anything else to the child machine
-                    {
-                        actions: [
-                            (c, e) =>
-                                console.log("forwarding to program sub", e),
-                            sendTo("programSubMachine", (_, e) => e),
-                        ],
                     },
                 ],
             },
@@ -131,10 +103,7 @@ const ConditionalMachine = createMachine({
                     // forward the event to expectInstructions state
                     {
                         target: "expectInstructions",
-                        actions: [
-                            send((_: any, event: TokenEvent) => event),
-                            (c, e) => console.log("forwarding to exIns", e),
-                        ],
+                        actions: send((_: any, event: TokenEvent) => event),
                     },
                 ],
             },
@@ -151,20 +120,12 @@ const ConditionalMachine = createMachine({
                     // and forward this token to the parent (because the parent
                     // must handle it, not us)
                     {
-                        actions: [
-                            sendParent(
-                                (_, e: TokenEvent): TokenEvent => ({
-                                    ...e,
-                                    forwardedByChild: true,
-                                })
-                            ),
-                            (c, e) =>
-                                console.log(
-                                    "exiting and forwarding to parent",
-                                    e,
-                                    c
-                                ),
-                        ],
+                        actions: sendParent(
+                            (_, e: TokenEvent): TokenEvent => ({
+                                ...e,
+                                forwardedByChild: true,
+                            })
+                        ),
 
                         target: "done",
                     },

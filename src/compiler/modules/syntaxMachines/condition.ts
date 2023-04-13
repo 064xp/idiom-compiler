@@ -4,7 +4,7 @@ import { TokenEvent, raiseSyntaxError } from "./programMachine";
 export type FinalStateEvent = {
     type: string;
     isFinal: boolean;
-}
+};
 
 const ConditionMachine = createMachine({
     predictableActionArguments: true,
@@ -25,7 +25,6 @@ const ConditionMachine = createMachine({
                             event.tokenType === "stringLiteral" ||
                             event.tokenType === "numberLiteral" ||
                             event.tokenType === "booleanLiteral",
-                        actions: (c, e) => console.log("condStart, got", e)
                     },
                     {
                         actions: (_, event: TokenEvent) =>

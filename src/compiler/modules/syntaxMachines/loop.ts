@@ -1,5 +1,4 @@
-import { createMachine, send, sendTo } from "xstate";
-import { stop } from "xstate/lib/actions";
+import { createMachine, send } from "xstate";
 import ProgramMachine, { TokenEvent, raiseSyntaxError } from "./programMachine";
 
 const LoopMachine = createMachine({
@@ -29,43 +28,23 @@ const LoopMachine = createMachine({
             },
         },
         instructions: {
-            entry: () => console.log("entering loop instructions"),
             invoke: {
                 id: "programSubMachine",
                 src: () => ProgramMachine,
+                autoForward: true,
                 data: {
                     isChild: true,
                 },
                 onDone: "expectInstrOrFin",
             },
             on: {
-                fin: {
-                    // If fin from child, empty loop
-                    cond: (_, e) => (e as TokenEvent).forwardedByChild,
-                    target: "done",
-                    actions: [
-                        (_, e) => console.log("stopping"),
-                        stop("programSubMachine"),
-                    ],
-                },
                 "*": [
                     {
                         cond: (_, e) => e.forwardedByChild,
-                        actions: [
-                            (c, e) =>
-                                console.log(
-                                    "loop got and is forwarding to self",
-                                    e
-                                ),
-                            send((_, e) => ({ ...e, forwardedByChild: false })),
-                        ],
-                    },
-                    {
-                        actions: [
-                            (c, e) =>
-                                console.log("forwarding to program sub", e),
-                            sendTo("programSubMachine", (_, e) => e),
-                        ],
+                        actions: send((_, e) => ({
+                            ...e,
+                            forwardedByChild: false,
+                        })),
                     },
                 ],
             },
@@ -92,11 +71,7 @@ const LoopMachine = createMachine({
                     // forward the event to expectInstructions state
                     {
                         target: "instructions",
-                        actions: [
-                            send((_: any, event: TokenEvent) => event),
-                            (c, e) =>
-                                console.log("forwarding to instructions", e),
-                        ],
+                        actions: send((_: any, event: TokenEvent) => event),
                     },
                 ],
             },
