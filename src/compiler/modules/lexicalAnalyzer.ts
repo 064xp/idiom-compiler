@@ -1,6 +1,5 @@
 export type TokenType =
     | "reserved"
-    | "indentationCharacter"
     | "identifier"
     | "comparisonOperator"
     | "newline"
@@ -9,6 +8,7 @@ export type TokenType =
     | "stringLiteral"
     | "numberLiteral"
     | "booleanLiteral"
+    | "specialCharacter"
     | "eof";
 
 type TokenPattern = {
@@ -50,6 +50,8 @@ const arithmeticOperators = ["mas", "menos", "entre", "por", "modulo", "[()]"];
 
 const booleanLiteral = ["Verdadero", "Falso"];
 
+const specialCharacters = [","]
+
 const stringLiteralPatterns = ['".*"', "'.*'"];
 const numberLiteralPatterns = ["\\d+"];
 
@@ -69,6 +71,7 @@ const tokenPatterns: TokenPattern[] = [
     { type: "comparisonOperator", regex: joinPatterns(comparisonOperators) },
     { type: "logicalOperator", regex: joinPatterns(logicalOperators) },
     { type: "arithmeticOperator", regex: joinPatterns(arithmeticOperators) },
+    { type: "specialCharacter", regex: joinPatterns(specialCharacters) },
     { type: "stringLiteral", regex: joinPatterns(stringLiteralPatterns) },
     { type: "numberLiteral", regex: joinPatterns(numberLiteralPatterns) },
     { type: "booleanLiteral", regex: joinPatterns(booleanLiteral) },

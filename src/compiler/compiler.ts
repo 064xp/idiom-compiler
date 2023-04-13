@@ -60,7 +60,14 @@ export const compileTest = () => {
 
     si x mayor que adsf entonces
         x asigna 23 mas 2
+        si x mayor que adsf entonces
+            repite 3 veces
+                muestra("hola!")
+            fin
+        fin
     fin
+
+    muestra(x, x, 2)
     `
     compile(p);
 };

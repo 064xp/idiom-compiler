@@ -5,6 +5,7 @@ import AssignmentMachine from "./assignment";
 import ConditionalMachine from "./conditional";
 
 import DeclarationMachine from "./declaration";
+import FunctionCallMachine from "./functionCall";
 import LoopMachine from "./loop";
 
 export type TokenEvent = {
@@ -99,7 +100,16 @@ const ProgramMachine = createMachine({
                 onDone: childOnDone,
             },
         },
-        functionCall: {},
+        functionCall: {
+            invoke: {
+                src: FunctionCallMachine,
+                autoForward: true,
+                data: {
+                    identifier: (c: ProgramMachineContext) => c.tempIdentifier,
+                },
+                onDone: childOnDone,
+            },
+        },
         declaration: {
             invoke: {
                 src: DeclarationMachine,
@@ -126,12 +136,19 @@ const ProgramMachine = createMachine({
                     // Since conditional needs to look ahead to know if there's an
                     // else or not, it forwards the last token to its parent.
                     // Here we forward that token event to this machine's parent
-                    // if it has one and if the event is marked as forwarded
+                    // if it has one and if it doesn't it forwards it to this
+                    // machine
                     {
                         cond: (c: ProgramMachineContext, e: TokenEvent) =>
                             e.forwardedByChild && c.isChild,
 
                         actions: sendParent((_, e) => e),
+                    },
+                    // Forward the last token the child machine consumed
+                    {
+                        cond: (c: ProgramMachineContext, e: TokenEvent) =>
+                            e.forwardedByChild,
+                        actions: send((_, e) => e),
                     },
                 ],
             },
