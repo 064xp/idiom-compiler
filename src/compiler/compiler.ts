@@ -36,7 +36,7 @@ const compile = (input: string): string => {
 };
 
 export const compileTest = () => {
-    // const p = "declara abd asigna x mas 22";
+    // const p = "abd asigna x mas 22";
     // const p = `declara texto asigna "Hola Mundo!"
     //  repite num3 veces
     //  	declara x asigna 3
@@ -45,14 +45,21 @@ export const compileTest = () => {
     //         declara test asigna 22 mas 22
     //     fin
     //  fin`;
+    // const p = `
+    // repite 3 veces
+    //     si x mayor que 10 entonces
+    //         declara a 
+    //     fin
+    //     si no pero xx entonces
+    //         declara b
+    //     fin
+    // fin
+    // `
     const p = `
-    repite 3 veces
-        si x mayor que 10 entonces
-            declara a 
-        fin
-        si no pero xx entonces
-            declara b
-        fin
+    declara x
+
+    si x mayor que adsf entonces
+        x asigna 23 mas 2
     fin
     `
     compile(p);

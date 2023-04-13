@@ -1,13 +1,21 @@
-import { createMachine } from "xstate";
+import { assign, createMachine } from "xstate";
 import { TokenEvent, raiseSyntaxError, SyntaxContext } from "./programMachine";
+import AssignmentMachine from "./assignment";
+
+type DeclarationContext = {
+    identifier: string;
+};
 
 const declarationMachine = createMachine({
     predictableActionArguments: true,
     id: "declaration",
     initial: "expectIdentifier",
     schema: {
-        context: {},
+        context: { identifier: "" } as DeclarationContext,
         events: {} as TokenEvent,
+    },
+    context: {
+        identifier: "",
     },
     states: {
         expectIdentifier: {
@@ -16,7 +24,10 @@ const declarationMachine = createMachine({
                     {
                         target: "expectAsigna",
                         cond: (_: SyntaxContext, event: TokenEvent) =>
-                            event.tokenType === "identifier"
+                            event.tokenType === "identifier",
+                        actions: assign({
+                            identifier: (_, e: TokenEvent) => e.type,
+                        }),
                     },
                     {
                         actions: (c: SyntaxContext, e: TokenEvent) =>
@@ -31,71 +42,30 @@ const declarationMachine = createMachine({
         },
         expectAsigna: {
             on: {
-                asigna: "expectValue",
+                asigna: "invokeAssignment",
                 "*": [
                     {
-                        target: 'done',
+                        target: "done",
                         cond: (_: SyntaxContext, event: TokenEvent) =>
-                            event.tokenType === "newline" || event.tokenType === "eof"
+                            event.tokenType === "newline" ||
+                            event.tokenType === "eof",
                     },
                     {
                         actions: (c: SyntaxContext, e: TokenEvent) =>
-                            raiseSyntaxError(
-                                c,
-                                e,
-                                `Se esperaba un "asigna"`
-                            ),
+                            raiseSyntaxError(c, e, `Se esperaba un "asigna"`),
                     },
                 ],
             },
         },
-        expectValue: {
-            on: [
-                {
-                    // if id or literal
-                    event: "*",
-                    target: "expectOperator",
-                    cond: (_: {}, event: TokenEvent) =>
-                        event.tokenType === "identifier" ||
-                        event.tokenType === "stringLiteral" ||
-                        event.tokenType === "numberLiteral",
+        invokeAssignment: {
+            invoke: {
+                id: "assignmentMachine",
+                src: AssignmentMachine,
+                autoForward: true,
+                data: {
+                    identifier: (c: DeclarationContext) => c.identifier,
                 },
-                {
-                    event: "*",
-                    actions: (c: SyntaxContext, e: TokenEvent) =>
-                        raiseSyntaxError(
-                            c,
-                            e,
-                            `Se esperaba un identificador o una literal`
-                        ),
-                },
-            ],
-        },
-        expectOperator: {
-            on: {
-                "*": [
-                    // if arithmetic operator
-                    {
-                        target: "expectValue",
-                        cond: (_: SyntaxContext, event: TokenEvent) =>
-                            event.tokenType === "arithmeticOperator",
-                    },
-                    // if eof
-                    {
-                        cond: (_: SyntaxContext, event: TokenEvent) =>
-                            event.tokenType === "eof",
-                        target: "done",
-                    },
-                    {
-                        actions: (c: SyntaxContext, e: TokenEvent) =>
-                            raiseSyntaxError(
-                                c,
-                                e,
-                                `Se esperaba un operador aritmético o fin de instrucción`
-                            ),
-                    },
-                ],
-                "\n": {
+                onDone: {
                     target: "done",
                 },
             },

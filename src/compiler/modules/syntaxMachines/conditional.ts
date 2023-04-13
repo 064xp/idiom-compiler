@@ -6,7 +6,6 @@ import {
     sendTo,
     forwardTo,
 } from "xstate";
-import { stop } from "xstate/lib/actions";
 import ConditionMachine, { FinalStateEvent } from "./condition";
 import ProgramMachine, { TokenEvent, raiseSyntaxError } from "./programMachine";
 

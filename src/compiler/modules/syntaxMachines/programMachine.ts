@@ -1,6 +1,7 @@
-import { createMachine, send, sendParent } from "xstate";
+import { assign, createMachine, send, sendParent } from "xstate";
 import { TokenType } from "../lexicalAnalyzer";
 import { SyntaxError } from "../syntacticAnalyzer";
+import AssignmentMachine from "./assignment";
 import ConditionalMachine from "./conditional";
 
 import DeclarationMachine from "./declaration";
@@ -16,6 +17,7 @@ export type TokenEvent = {
 
 type ProgramMachineContext = {
     isChild: boolean;
+    tempIdentifier: string;
 };
 
 export const raiseSyntaxError = (
@@ -45,10 +47,13 @@ const ProgramMachine = createMachine({
     id: "program",
     initial: "start",
     schema: {
-        context: { isChild: false } as ProgramMachineContext,
+        context: {
+            isChild: false,
+            tempIdentifier: "",
+        } as ProgramMachineContext,
         events: {} as TokenEvent,
     },
-    context: { isChild: false },
+    context: { isChild: false, tempIdentifier: "" },
     states: {
         start: {
             on: {
@@ -57,6 +62,15 @@ const ProgramMachine = createMachine({
                 repite: "loop",
                 si: "conditional",
                 "*": [
+                    // On identifier
+                    {
+                        cond: (_, e: TokenEvent) =>
+                            e.tokenType === "identifier",
+                        target: "identifier",
+                        actions: assign({
+                            tempIdentifier: (_, e: TokenEvent) => e.type,
+                        }),
+                    },
                     {
                         // ignore EOFs
                         cond: (_, event: TokenEvent) =>
@@ -69,6 +83,23 @@ const ProgramMachine = createMachine({
                 ],
             },
         },
+        identifier: {
+            on: {
+                asigna: "assignment",
+                "(": "functionCall",
+            },
+        },
+        assignment: {
+            invoke: {
+                src: AssignmentMachine,
+                autoForward: true,
+                data: {
+                    identifier: (c: ProgramMachineContext) => c.tempIdentifier,
+                },
+                onDone: childOnDone,
+            },
+        },
+        functionCall: {},
         declaration: {
             invoke: {
                 src: DeclarationMachine,
