@@ -47,7 +47,7 @@ const ConditionalMachine = createMachine({
 
                             console.log("got entonces, going to exInst?", cond);
                             return cond;
-                        }
+                        },
                     },
                     // If condition machine is not in final state
                     // forward "entonces" so that the corresponding state
@@ -76,35 +76,35 @@ const ConditionalMachine = createMachine({
                     isChild: true,
                 },
                 onDone: "expectInstrOrFin",
-                autoForward: true
+                // autoForward: true,
             },
 
             on: {
                 fin: {
                     // When we get a "fin", if it comes from the child machine
                     // it means we have an empty conditional statement
-                    // If it's not from the child, it a new token, forward it
-                    // to child
                     cond: (_, e) => (e as TokenEvent).forwardedByChild,
                     target: "expectElse",
                     actions: [
-                        (_, e) => console.log("got fin"),
+                        (_, e) => console.log("stopping"),
                         stop("programSubMachine"),
-                    ]
+                    ],
                 },
-                "*": [
-                    {
 
-                    },
+                "*": [
                     // Forward event to self if it was forwarded by child
                     {
                         actions: [send((_, e) => e)],
                         cond: (_, e) => (e as TokenEvent).forwardedByChild,
                     },
                     // Forward anything else to the child machine
-                    // {
-                    //     actions: sendTo("programSubMachine", (_, e) => e),
-                    // },
+                    {
+                        actions: [
+                            (c, e) =>
+                                console.log("forwarding to program sub", e),
+                            sendTo("programSubMachine", (_, e) => e),
+                        ],
+                    },
                 ],
             },
         },

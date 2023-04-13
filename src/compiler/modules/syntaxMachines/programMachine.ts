@@ -79,9 +79,22 @@ const ProgramMachine = createMachine({
                         cond: (_, event: TokenEvent) =>
                             event.tokenType === "eof",
                     },
+                    // If its not a child, and event is forwarded
+                    // forward event to itself (this machine)
+                    // {
+                    //     cond: (c: ProgramMachineContext, e: TokenEvent) =>
+                    //         e.forwardedByChild,
+                    //     actions: [
+                    //         send((_, e) => e),
+                    //         (c, e) => console.log("forwarding to self", e, c),
+                    //     ],
+                    // },
                     {
-                        actions: (c: ProgramMachineContext, e: TokenEvent) =>
-                            raiseSyntaxError(c, e, "Token no esperado"),
+                        actions: [
+                            (c, e) => console.log("idk token", e),
+                            (c: ProgramMachineContext, e: TokenEvent) =>
+                                raiseSyntaxError(c, e, "Token no esperado"),
+                        ],
                     },
                 ],
             },
@@ -125,10 +138,17 @@ const ProgramMachine = createMachine({
                         },
 
                         actions: [
-                            (c, e, m) => console.log("sending to parent", e, c, m),
+                            (c, e, m) =>
+                                console.log("sending to parent", e, c, m),
                             sendParent((_, e) => e),
                         ],
                     },
+
+                    // If child forwarded something to this machine, resend it
+                    {
+                        cond: (_,e) => e.forwardedByChild,
+                        actions: send((_, e) => e)
+                    }
                 ],
             },
         },

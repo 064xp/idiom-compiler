@@ -46,8 +46,13 @@ export const compileTest = () => {
     //     fin
     //  fin`;
     const p = `
-    repite 3 veces
+    si x entonces
+        si xx entonces
+            repite 3 veces
+                declara works
+        fin
     fin
+
     `
     compile(p);
 };

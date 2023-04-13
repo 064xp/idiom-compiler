@@ -33,26 +33,22 @@ const LoopMachine = createMachine({
             invoke: {
                 id: "programSubMachine",
                 src: () => ProgramMachine,
-                autoForward: true,
                 data: {
                     isChild: true,
                 },
                 onDone: "expectInstrOrFin",
             },
             on: {
+                fin: {
+                    // If fin from child, empty loop
+                    cond: (_, e) => (e as TokenEvent).forwardedByChild,
+                    target: "done",
+                    actions: [
+                        (_, e) => console.log("stopping"),
+                        stop("programSubMachine"),
+                    ],
+                },
                 "*": [
-                    {
-                        // In case of empty loop
-                        // actions: send((_, e) => e),
-                        cond: (_, e) =>
-                            (e as TokenEvent).forwardedByChild &&
-                            (e as TokenEvent).type === "fin",
-                        target: "done",
-                        actions: [
-                            stop("programSubmachine"),
-                            () => console.log("got fin from child"),
-                        ],
-                    },
                     {
                         cond: (_, e) => e.forwardedByChild,
                         actions: [
@@ -61,7 +57,14 @@ const LoopMachine = createMachine({
                                     "loop got and is forwarding to self",
                                     e
                                 ),
-                            send((_, e) => ({...e, forwardedByChild: false})),
+                            send((_, e) => ({ ...e, forwardedByChild: false })),
+                        ],
+                    },
+                    {
+                        actions: [
+                            (c, e) =>
+                                console.log("forwarding to program sub", e),
+                            sendTo("programSubMachine", (_, e) => e),
                         ],
                     },
                 ],
