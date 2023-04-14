@@ -148,6 +148,8 @@ export const conf: languages.LanguageConfiguration = {
         { open: "(", close: ")" },
         { open: '"', close: '"', notIn: ["string"] },
         { open: "'", close: "'", notIn: ["string", "comment"] },
+        { open: "entonces", close: "fin" },
+        { open: "veces", close: "fin" },
     ],
     surroundingPairs: [
         { open: "{", close: "}" },
@@ -158,16 +160,16 @@ export const conf: languages.LanguageConfiguration = {
     ],
     onEnterRules: [
         {
-            beforeText: new RegExp("^\\s*(?:repite|si).*?[:(?:entonces)]\\s*$"),
-            action: { indentAction: languages.IndentAction.Indent },
+            beforeText: new RegExp("^\\s*(?:repite|si).*?[(?:entonces)|(?:veces)]\\s*$"),
+            action: { indentAction: languages.IndentAction.IndentOutdent },
         },
     ],
     folding: {
         offSide: true,
-        markers: {
-            start: new RegExp("^\\s*#region\\b"),
-            end: new RegExp("^\\s*#endregion\\b"),
-        },
+        // markers: {
+        //     start: new RegExp("^\\s*#region\\b"),
+        //     end: new RegExp("^\\s*#endregion\\b"),
+        // },
     },
 };
 
