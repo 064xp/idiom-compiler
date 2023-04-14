@@ -46,11 +46,11 @@ const comparisonOperators = ["menor que", "mayor que", "igual que"];
 
 const logicalOperators = ["y", "o"];
 
-const arithmeticOperators = ["mas", "menos", "entre", "por", "modulo", "[()]"];
+const arithmeticOperators = ["mas", "menos", "entre", "por", "modulo" ];
 
 const booleanLiteral = ["Verdadero", "Falso"];
 
-const specialCharacters = [","];
+const specialCharacters = [",", "[()]"];
 
 const stringLiteralPatterns = ['".*"', "'.*'"];
 const numberLiteralPatterns = ["\\d+"];

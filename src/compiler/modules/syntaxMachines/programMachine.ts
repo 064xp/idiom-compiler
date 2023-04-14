@@ -43,6 +43,7 @@ const childOnDone = [
     },
 ];
 
+//@ts-ignore
 const ProgramMachine = createMachine({
     predictableActionArguments: true,
     id: "program",
@@ -88,6 +89,14 @@ const ProgramMachine = createMachine({
             on: {
                 asigna: "assignment",
                 "(": "functionCall",
+                "*": {
+                    actions: (c: ProgramMachineContext, e: TokenEvent) =>
+                        raiseSyntaxError(
+                            c,
+                            e,
+                            "Se esperaba una asignación o invocación de función"
+                        ),
+                },
             },
         },
         assignment: {

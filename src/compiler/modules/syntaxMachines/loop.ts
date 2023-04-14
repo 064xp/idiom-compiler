@@ -1,6 +1,7 @@
 import { createMachine, send } from "xstate";
 import ProgramMachine, { TokenEvent, raiseSyntaxError } from "./programMachine";
 
+//@ts-ignore
 const LoopMachine = createMachine({
     predictableActionArguments: true,
     id: "loop",

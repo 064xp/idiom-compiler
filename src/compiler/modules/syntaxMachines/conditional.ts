@@ -9,6 +9,7 @@ import {
 import ConditionMachine, { FinalStateEvent } from "./condition";
 import ProgramMachine, { TokenEvent, raiseSyntaxError } from "./programMachine";
 
+//@ts-ignore
 const ConditionalMachine = createMachine({
     predictableActionArguments: true,
     id: "conditional",
