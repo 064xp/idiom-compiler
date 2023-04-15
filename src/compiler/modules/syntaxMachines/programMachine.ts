@@ -27,7 +27,7 @@ export type SyntaxMachineOnDone = DoneInvokeEvent<CodeGenResult>;
 
 export type ProgramMachineContext = {
     isChild: boolean;
-    tempIdentifier: string;
+    tempIdentifier?: TokenEvent;
     symbolTable?: SymbolTable;
     generatedString: string;
 };
@@ -75,14 +75,12 @@ const ProgramMachine = createMachine({
         context: {} as ProgramMachineContext,
         events: {} as TokenEvent,
     },
-    context: { isChild: false, tempIdentifier: "", generatedString: "" },
+    context: { isChild: false, generatedString: "" },
     states: {
         start: {
             entry: assign({
                 generatedString: (c: ProgramMachineContext) =>
                     c.generatedString || "",
-                tempIdentifier: (c: ProgramMachineContext) =>
-                    c.tempIdentifier || "",
             }),
             on: {
                 declara: "declaration",
@@ -96,7 +94,7 @@ const ProgramMachine = createMachine({
                             e.tokenType === "identifier",
                         target: "identifier",
                         actions: assign({
-                            tempIdentifier: (_, e: TokenEvent) => e.type,
+                            tempIdentifier: (_, e: TokenEvent) => e,
                         }),
                     },
                     {
@@ -142,7 +140,9 @@ const ProgramMachine = createMachine({
                 src: FunctionCallMachine,
                 autoForward: true,
                 data: {
+                    ...FunctionCallMachine.initialState.context,
                     identifier: (c: ProgramMachineContext) => c.tempIdentifier,
+                    symbolTable: (c: ProgramMachineContext) => c.symbolTable,
                 },
                 onDone: childOnDone,
             },

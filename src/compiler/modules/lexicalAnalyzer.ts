@@ -9,6 +9,7 @@ export type TokenType =
     | "numberLiteral"
     | "booleanLiteral"
     | "specialCharacter"
+    | "function"
     | "eof";
 
 type TokenPattern = {

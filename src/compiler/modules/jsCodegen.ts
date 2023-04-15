@@ -205,8 +205,46 @@ export const generateConditional = (
         else {
             ${instructionBlocks[instructionBlocks.length - 1]}
         }
-        `
+        `;
     }
+
+    return output;
+};
+
+export const generateFunctionCall = (
+    symbolTable: SymbolTable,
+    parameters: TokenEvent[],
+    functionName: TokenEvent
+): string => {
+    if (!symbolTable.has(functionName.type))
+        throw new SemanticError(
+            `La función "${functionName.type}" no existe`,
+            functionName.row,
+            functionName.col
+        );
+
+    if (symbolTable.get(functionName.type)!.type !== "function")
+        throw new SemanticError(
+            `El identificador "${functionName.type}" no es una función`,
+            functionName.row,
+            functionName.col
+        );
+
+    let output = `${functionName.type}(`;
+
+    parameters.forEach((p, i) => {
+        if (p.tokenType === "identifier" && !symbolTable.has(p.type))
+            throw new SemanticError(
+                `El parámetro "${p.type}" para la función ${functionName.type} no existe`,
+                p.row,
+                p.col
+            );
+
+        output += p.type;
+        if (i !== parameters.length - 1) output += ",";
+    });
+
+    output += ");";
 
     return output;
 };

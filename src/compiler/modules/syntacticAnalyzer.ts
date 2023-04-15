@@ -4,6 +4,7 @@ import ProgramMachine, {
     ProgramMachineContext,
     TokenEvent,
 } from "./syntaxMachines/programMachine";
+import * as stdLib from "../standardLibrary";
 
 export class SyntaxError extends Error {
     row: number;
@@ -24,6 +25,7 @@ export default class SyntaxAnalyzer {
     #symbolTable: SymbolTable = new Map<string, { type: TokenType }>();
 
     constructor() {
+        this.#initializeSymbolTable();
         //@ts-ignore
         this.#service = interpret(
             ProgramMachine.withContext({
@@ -32,6 +34,15 @@ export default class SyntaxAnalyzer {
             })
         );
         this.#service.start();
+    }
+
+    #initializeSymbolTable() {
+        Object.keys(stdLib).forEach((key) => {
+            if (typeof stdLib[key as keyof typeof stdLib] === "function")
+                this.#symbolTable.set(key, {
+                    type: "function",
+                });
+        });
     }
 
     parseToken(token: Token) {

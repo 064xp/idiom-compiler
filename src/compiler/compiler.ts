@@ -78,6 +78,8 @@ export const compileTest = () => {
     si no entonces
         declara xx asigna 111
     fin
+
+    muestra(x)
     `
     compile(p);
 };
