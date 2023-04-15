@@ -42,11 +42,23 @@ const reservedKeywords = [
 
 const builtinFunctions = ["muestra"];
 
-const comparisonOperators = ["menor que", "mayor que", "igual que"];
+const comparisonOperators = [
+    "menor que",
+    "mayor que",
+    "igual que",
+    "menor o igual que",
+    "mayor o igual que",
+];
 
 const logicalOperators = ["y\\b", "o\\b"];
 
-const arithmeticOperators = ["mas\\b", "menos\\b", "entre\\b", "por\\b", "modulo\\b" ];
+const arithmeticOperators = [
+    "mas\\b",
+    "menos\\b",
+    "entre\\b",
+    "por\\b",
+    "modulo\\b",
+];
 
 const booleanLiteral = ["Verdadero\\b", "Falso\\b"];
 

@@ -1,5 +1,5 @@
 import { assign, createMachine } from "xstate";
-import {  generateAssignment } from "../jsCodegen";
+import { generateAssignment } from "../jsCodegen";
 import { SymbolTable } from "../syntacticAnalyzer";
 import { TokenEvent, raiseSyntaxError } from "./programMachine";
 

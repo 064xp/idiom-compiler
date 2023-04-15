@@ -1,6 +1,5 @@
 import { assign, createMachine, send } from "xstate";
 import { generateLoop } from "../jsCodegen";
-import { Token } from "../lexicalAnalyzer";
 import { SymbolTable } from "../syntacticAnalyzer";
 import ProgramMachine, {
     TokenEvent,
@@ -59,10 +58,9 @@ const LoopMachine = createMachine({
                 onDone: {
                     target: "expectInstrOrFin",
                     actions: assign({
-                        instructionsString: (c, e: SyntaxMachineOnDone) =>{
-                            console.log("loop instruction", e);
+                        instructionsString: (c, e: SyntaxMachineOnDone) => {
                             return c.instructionsString + e.data.result;
-                        }
+                        },
                     }),
                 },
             },

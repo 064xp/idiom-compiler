@@ -175,6 +175,10 @@ const ProgramMachine = createMachine({
                 onDone: childOnDone,
                 id: "conditionalMachine",
                 autoForward: true,
+                data: { 
+                    ...ConditionalMachine.initialState.context,
+                    symbolTable: (c: ProgramMachineContext) => c.symbolTable,
+                },
             },
             on: {
                 "*": [

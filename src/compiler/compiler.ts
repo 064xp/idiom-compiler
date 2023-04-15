@@ -61,6 +61,23 @@ export const compileTest = () => {
         declara repiteABC asigna 1 mas testing modulo 5
 
     fin
+
+    declara x asigna 2
+    declara yo asigna 100
+
+    si x mayor que 3 o yo menor que 25 entonces
+        declara a asigna 25
+        declara abc asigna "testing"
+    fin
+    si no pero x menor o igual que 5 entonces
+        declara aa asigna 2
+    fin
+    si no pero yo mayor o igual que 9 entonces
+        declara aaa asigna 19
+    fin
+    si no entonces
+        declara xx asigna 111
+    fin
     `
     compile(p);
 };
