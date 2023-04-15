@@ -1,6 +1,13 @@
-import { assign, createMachine, send, sendParent } from "xstate";
+import {
+    assign,
+    createMachine,
+    DoneInvokeEvent,
+    send,
+    sendParent,
+} from "xstate";
+import { CodeGenResult } from "../jsCodegen";
 import { TokenType } from "../lexicalAnalyzer";
-import { SyntaxError } from "../syntacticAnalyzer";
+import { SyntaxError, SymbolTable } from "../syntacticAnalyzer";
 
 import AssignmentMachine from "./assignment";
 import ConditionalMachine from "./conditional";
@@ -16,9 +23,13 @@ export type TokenEvent = {
     forwardedByChild: boolean;
 };
 
-type ProgramMachineContext = {
+export type SyntaxMachineOnDone = DoneInvokeEvent<CodeGenResult>;
+
+export type ProgramMachineContext = {
     isChild: boolean;
     tempIdentifier: string;
+    symbolTable?: SymbolTable;
+    generatedString: string;
 };
 
 export const raiseSyntaxError = (
@@ -37,9 +48,21 @@ const childOnDone = [
     {
         target: "done",
         cond: (c: ProgramMachineContext) => c.isChild,
+        actions: assign({
+            generatedString: (
+                c: ProgramMachineContext,
+                e: SyntaxMachineOnDone
+            ) => c.generatedString + e.data.result,
+        }),
     },
     {
         target: "start",
+        actions: assign({
+            generatedString: (
+                c: ProgramMachineContext,
+                e: SyntaxMachineOnDone
+            ) => c.generatedString + e.data.result,
+        }),
     },
 ];
 
@@ -49,15 +72,18 @@ const ProgramMachine = createMachine({
     id: "program",
     initial: "start",
     schema: {
-        context: {
-            isChild: false,
-            tempIdentifier: "",
-        } as ProgramMachineContext,
+        context: {} as ProgramMachineContext,
         events: {} as TokenEvent,
     },
-    context: { isChild: false, tempIdentifier: "" },
+    context: { isChild: false, tempIdentifier: "", generatedString: "" },
     states: {
         start: {
+            entry: assign({
+                generatedString: (c: ProgramMachineContext) =>
+                    c.generatedString || "",
+                tempIdentifier: (c: ProgramMachineContext) =>
+                    c.tempIdentifier || "",
+            }),
             on: {
                 declara: "declaration",
                 "\n": {},
@@ -104,7 +130,9 @@ const ProgramMachine = createMachine({
                 src: AssignmentMachine,
                 autoForward: true,
                 data: {
+                    ...DeclarationMachine.initialState.context,
                     identifier: (c: ProgramMachineContext) => c.tempIdentifier,
+                    symbolTable: (c: ProgramMachineContext) => c.symbolTable,
                 },
                 onDone: childOnDone,
             },
@@ -124,6 +152,10 @@ const ProgramMachine = createMachine({
                 src: DeclarationMachine,
                 autoForward: true,
                 onDone: childOnDone,
+                data: {
+                    ...DeclarationMachine.initialState.context,
+                    symbolTable: (c: ProgramMachineContext) => c.symbolTable,
+                },
             },
         },
         loop: {
@@ -131,6 +163,10 @@ const ProgramMachine = createMachine({
                 src: LoopMachine,
                 autoForward: true,
                 onDone: childOnDone,
+                data: {
+                    ...LoopMachine.initialState.context,
+                    symbolTable: (c: ProgramMachineContext) => c.symbolTable,
+                },
             },
         },
         conditional: {
@@ -164,6 +200,16 @@ const ProgramMachine = createMachine({
         },
         done: {
             type: "final",
+            data: (c, _) => {
+                if (c.symbolTable === undefined)
+                    throw new Error(
+                        "Symbol table was not passed to program machine."
+                    );
+
+                return {
+                    result: c.generatedString,
+                };
+            },
         },
     },
 });

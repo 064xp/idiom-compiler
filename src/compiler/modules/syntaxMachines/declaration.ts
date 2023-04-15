@@ -1,9 +1,17 @@
 import { assign, createMachine } from "xstate";
-import { TokenEvent, raiseSyntaxError } from "./programMachine";
+import {
+    TokenEvent,
+    raiseSyntaxError,
+    SyntaxMachineOnDone,
+} from "./programMachine";
 import AssignmentMachine from "./assignment";
+import { SymbolTable } from "../syntacticAnalyzer";
+import { generateDeclaration } from "../jsCodegen";
 
 type DeclarationContext = {
-    identifier: string;
+    identifier?: TokenEvent;
+    assignmentString: string;
+    symbolTable?: SymbolTable;
 };
 
 const declarationMachine = createMachine({
@@ -11,11 +19,11 @@ const declarationMachine = createMachine({
     id: "declaration",
     initial: "expectIdentifier",
     schema: {
-        context: { identifier: "" } as DeclarationContext,
+        context: {} as DeclarationContext,
         events: {} as TokenEvent,
     },
     context: {
-        identifier: "",
+        assignmentString: "",
     },
     states: {
         expectIdentifier: {
@@ -26,7 +34,7 @@ const declarationMachine = createMachine({
                         cond: (_, event: TokenEvent) =>
                             event.tokenType === "identifier",
                         actions: assign({
-                            identifier: (_, e: TokenEvent) => e.type,
+                            identifier: (_, e: TokenEvent) => e,
                         }),
                     },
                     {
@@ -63,15 +71,37 @@ const declarationMachine = createMachine({
                 src: AssignmentMachine,
                 autoForward: true,
                 data: {
+                    ...AssignmentMachine.initialState.context,
                     identifier: (c: DeclarationContext) => c.identifier,
+                    symbolTable: (c: DeclarationContext) => c.symbolTable,
                 },
                 onDone: {
                     target: "done",
+                    actions: assign({
+                        assignmentString: (
+                            _: DeclarationContext,
+                            e: SyntaxMachineOnDone
+                        ) => e.data.result,
+                    }),
                 },
             },
         },
         done: {
             type: "final",
+            data: (c, _) => {
+                if (c.symbolTable === undefined)
+                    throw new Error(
+                        "Symbol table was not passed to declaration machine."
+                    );
+
+                return {
+                    result: generateDeclaration(
+                        c.symbolTable,
+                        c.identifier as TokenEvent,
+                        c.assignmentString
+                    ),
+                };
+            },
         },
     },
 });

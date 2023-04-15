@@ -1,8 +1,12 @@
-import { createMachine } from "xstate";
+import { assign, createMachine } from "xstate";
+import {  generateAssignment } from "../jsCodegen";
+import { SymbolTable } from "../syntacticAnalyzer";
 import { TokenEvent, raiseSyntaxError } from "./programMachine";
 
 type AssignmentContext = {
-    identifier: string;
+    identifier?: TokenEvent;
+    tokens: TokenEvent[];
+    symbolTable?: SymbolTable;
 };
 
 const AssignmentMachine = createMachine({
@@ -10,11 +14,11 @@ const AssignmentMachine = createMachine({
     id: "assignment",
     initial: "expectValue",
     schema: {
-        context: { identifier: "" } as AssignmentContext,
+        context: {} as AssignmentContext,
         events: {} as TokenEvent,
     },
     context: {
-        identifier: "",
+        tokens: [],
     },
     states: {
         expectValue: {
@@ -28,6 +32,9 @@ const AssignmentMachine = createMachine({
                             event.tokenType === "stringLiteral" ||
                             event.tokenType === "numberLiteral" ||
                             event.tokenType === "booleanLiteral",
+                        actions: assign({
+                            tokens: (c, e) => [...c.tokens, e],
+                        }),
                     },
                     {
                         actions: (c, e) =>
@@ -48,6 +55,9 @@ const AssignmentMachine = createMachine({
                         target: "expectValue",
                         cond: (_, event: TokenEvent) =>
                             event.tokenType === "arithmeticOperator",
+                        actions: assign({
+                            tokens: (c, e) => [...c.tokens, e],
+                        }),
                     },
                     // if eof
                     {
@@ -71,6 +81,20 @@ const AssignmentMachine = createMachine({
         },
         done: {
             type: "final",
+            data: (c, _) => {
+                if (c.symbolTable === undefined)
+                    throw new Error(
+                        "Symbol table was not passed to assignment machine."
+                    );
+
+                return {
+                    result: generateAssignment(
+                        c.symbolTable,
+                        c.tokens,
+                        c.identifier as TokenEvent
+                    ),
+                };
+            },
         },
     },
 });

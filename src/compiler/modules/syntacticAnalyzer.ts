@@ -1,6 +1,9 @@
 import { interpret } from "xstate";
-import { Token } from "./lexicalAnalyzer";
-import ProgramMachine, { TokenEvent } from "./syntaxMachines/programMachine";
+import { Token, TokenType } from "./lexicalAnalyzer";
+import ProgramMachine, {
+    ProgramMachineContext,
+    TokenEvent,
+} from "./syntaxMachines/programMachine";
 
 export class SyntaxError extends Error {
     row: number;
@@ -13,24 +16,32 @@ export class SyntaxError extends Error {
     }
 }
 
+export type SymbolTable = Map<string, { type: TokenType }>;
+
 export default class SyntaxAnalyzer {
     #service;
     #lastToken: Token | undefined;
+    #symbolTable: SymbolTable = new Map<string, { type: TokenType }>();
 
     constructor() {
         //@ts-ignore
-        this.#service = interpret(ProgramMachine);
+        this.#service = interpret(
+            ProgramMachine.withContext({
+                ...ProgramMachine.initialState.context,
+                symbolTable: this.#symbolTable,
+            })
+        );
         this.#service.start();
     }
 
     parseToken(token: Token) {
         this.#lastToken = token;
-        const obj:TokenEvent = {
+        const obj: TokenEvent = {
             type: token.token,
             tokenType: token.type,
             row: token.row,
             col: token.col,
-            forwardedByChild: false
+            forwardedByChild: false,
         };
 
         this.#service.send(obj);
@@ -50,7 +61,12 @@ export default class SyntaxAnalyzer {
                 );
             }
 
+            const generatedCode = (ss.context as ProgramMachineContext)
+                .generatedString as string;
             console.log("Analisis sintáctico exitoso!");
+
+            console.log(generatedCode);
+            console.log(this.#symbolTable);
         }
 
         this.#lastToken = token;
@@ -71,9 +87,9 @@ export default class SyntaxAnalyzer {
     }
 
     /**
-        * @summary for debug purposes only. 
-        * Recursively gets the state of the children of all machines
-    */
+     * @summary for debug purposes only.
+     * Recursively gets the state of the children of all machines
+     */
     #getStateValues(children: any): string[] {
         const values: string[] = [];
 
