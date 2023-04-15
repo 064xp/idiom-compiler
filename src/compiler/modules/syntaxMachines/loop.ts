@@ -1,5 +1,18 @@
-import { createMachine, send } from "xstate";
-import ProgramMachine, { TokenEvent, raiseSyntaxError } from "./programMachine";
+import { assign, createMachine, send } from "xstate";
+import { generateLoop } from "../jsCodegen";
+import { Token } from "../lexicalAnalyzer";
+import { SymbolTable } from "../syntacticAnalyzer";
+import ProgramMachine, {
+    TokenEvent,
+    raiseSyntaxError,
+    SyntaxMachineOnDone,
+} from "./programMachine";
+
+type LoopContext = {
+    instructionsString: string;
+    iterations?: TokenEvent;
+    symbolTable?: SymbolTable;
+};
 
 //@ts-ignore
 const LoopMachine = createMachine({
@@ -7,8 +20,11 @@ const LoopMachine = createMachine({
     id: "loop",
     initial: "expectNum",
     schema: {
-        context: {},
+        context: {} as LoopContext,
         events: {} as TokenEvent,
+    },
+    context: {
+        instructionsString: "",
     },
     states: {
         expectNum: {
@@ -18,6 +34,9 @@ const LoopMachine = createMachine({
                     cond: (_, event: TokenEvent) =>
                         event.tokenType === "numberLiteral" ||
                         event.tokenType === "identifier",
+                    actions: assign({
+                        iterations: (_, e: TokenEvent) => e,
+                    }),
                 },
             },
         },
@@ -35,8 +54,17 @@ const LoopMachine = createMachine({
                 autoForward: true,
                 data: {
                     isChild: true,
+                    symbolTable: (c: LoopContext) => c.symbolTable,
                 },
-                onDone: "expectInstrOrFin",
+                onDone: {
+                    target: "expectInstrOrFin",
+                    actions: assign({
+                        instructionsString: (c, e: SyntaxMachineOnDone) =>{
+                            console.log("loop instruction", e);
+                            return c.instructionsString + e.data.result;
+                        }
+                    }),
+                },
             },
             on: {
                 "*": [
@@ -79,6 +107,20 @@ const LoopMachine = createMachine({
         },
         done: {
             type: "final",
+            data: (c, _) => {
+                if (c.symbolTable === undefined)
+                    throw new Error(
+                        "Symbol table was not passed to loop machine."
+                    );
+
+                return {
+                    result: generateLoop(
+                        c.symbolTable,
+                        c.iterations as TokenEvent,
+                        c.instructionsString
+                    ),
+                };
+            },
         },
     },
 });

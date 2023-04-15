@@ -56,7 +56,11 @@ export const compileTest = () => {
     // fin
     // `
     const p = `
-    declara repiteABC
+    repite 3 veces
+        declara testing asigna 3
+        declara repiteABC asigna 1 mas testing modulo 5
+
+    fin
     `
     compile(p);
 };
