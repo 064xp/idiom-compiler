@@ -28,27 +28,27 @@ const reservedKeywords = [
     // Conditional
     "si no pero",
     "si no",
-    "si\b",
-    "entonces\b",
+    "si\\b",
+    "entonces\\b",
     // Declaration, assignment
-    "declara\b",
-    "asigna\b",
+    "declara\\b",
+    "asigna\\b",
     // loops
-    "repite\b",
-    "veces\b",
-    "fin\b",
-    "es\b",
+    "repite\\b",
+    "veces\\b",
+    "fin\\b",
+    "es\\b",
 ];
 
 const builtinFunctions = ["muestra"];
 
 const comparisonOperators = ["menor que", "mayor que", "igual que"];
 
-const logicalOperators = ["y\b", "o\b"];
+const logicalOperators = ["y\\b", "o\\b"];
 
-const arithmeticOperators = ["mas\b", "menos\b", "entre\b", "por\b", "modulo\b" ];
+const arithmeticOperators = ["mas\\b", "menos\\b", "entre\\b", "por\\b", "modulo\\b" ];
 
-const booleanLiteral = ["Verdadero\b", "Falso\b"];
+const booleanLiteral = ["Verdadero\\b", "Falso\\b"];
 
 const specialCharacters = [",", "[()]"];
 

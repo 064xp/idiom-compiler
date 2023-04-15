@@ -30,7 +30,7 @@ const prepareTokens = (
 
         if (removeWordBoundary) {
             for (let i = 0; i < separatedToken.length; i++) {
-                separatedToken[i] = separatedToken[i].split("\b").join("");
+                separatedToken[i] = separatedToken[i].split("\\b").join("");
             }
         }
 
