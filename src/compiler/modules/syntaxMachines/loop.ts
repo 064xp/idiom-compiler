@@ -1,17 +1,17 @@
 import { assign, createMachine, send } from "xstate";
 import { generateLoop } from "../jsCodegen";
-import { SymbolTable } from "../syntacticAnalyzer";
+import { assignScopeID, clearScopeSymbols } from "../utils";
 import ProgramMachine, {
     TokenEvent,
     raiseSyntaxError,
     SyntaxMachineOnDone,
+    ScopedContext,
 } from "./programMachine";
 
-type LoopContext = {
+interface LoopContext extends ScopedContext {
     instructionsString: string;
     iterations?: TokenEvent;
-    symbolTable?: SymbolTable;
-};
+}
 
 //@ts-ignore
 const LoopMachine = createMachine({
@@ -24,9 +24,12 @@ const LoopMachine = createMachine({
     },
     context: {
         instructionsString: "",
+        scopeID: "",
     },
     states: {
         expectNum: {
+            //@ts-ignore
+            entry: assignScopeID,
             on: {
                 "*": {
                     target: "expectVeces",
@@ -54,6 +57,7 @@ const LoopMachine = createMachine({
                 data: {
                     isChild: true,
                     symbolTable: (c: LoopContext) => c.symbolTable,
+                    scopeID: (c: LoopContext) => c.scopeID,
                 },
                 onDone: {
                     target: "expectInstrOrFin",
@@ -111,13 +115,17 @@ const LoopMachine = createMachine({
                         "Symbol table was not passed to loop machine."
                     );
 
-                return {
+                const result = {
                     result: generateLoop(
                         c.symbolTable,
                         c.iterations as TokenEvent,
                         c.instructionsString
                     ),
                 };
+
+                clearScopeSymbols(c);
+
+                return result;
             },
         },
     },

@@ -1,6 +1,6 @@
 import { assign, createMachine, sendParent } from "xstate";
 import { respond } from "xstate/lib/actions";
-import { CodeGenEvent,  generateCondition } from "../jsCodegen";
+import { CodeGenEvent, generateCondition } from "../jsCodegen";
 import { SymbolTable } from "../syntacticAnalyzer";
 import { TokenEvent, raiseSyntaxError } from "./programMachine";
 

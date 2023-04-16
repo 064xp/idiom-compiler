@@ -17,7 +17,7 @@ export class SyntaxError extends Error {
     }
 }
 
-export type SymbolTable = Map<string, { type: TokenType }>;
+export type SymbolTable = Map<string, { type: TokenType; scopeID: string }>;
 
 export default class SyntaxAnalyzer {
     #service;
@@ -41,6 +41,7 @@ export default class SyntaxAnalyzer {
             if (typeof stdLib[key as keyof typeof stdLib] === "function")
                 this.#symbolTable.set(key, {
                     type: "function",
+                    scopeID: "global",
                 });
         });
     }

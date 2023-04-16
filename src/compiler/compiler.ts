@@ -56,27 +56,32 @@ export const compileTest = () => {
     // fin
     // `
     const p = `
+    declara global asigna "Mr WorldWide"
+
     repite 3 veces
         declara testing asigna 3
         declara repiteABC asigna 1 mas testing modulo 5
-
     fin
 
     declara x asigna 2
     declara yo asigna 100
 
     si x mayor que 3 o yo menor que 25 entonces
+        declara testing asigna 44
         declara a asigna 25
         declara abc asigna "testing"
     fin
     si no pero x menor o igual que 5 entonces
+        declara testing asigna 19021
         declara aa asigna 2
     fin
     si no pero yo mayor o igual que 9 entonces
+        declara testing asigna 123129
         declara aaa asigna 19
     fin
     si no entonces
         declara xx asigna 111
+        declara testing asigna 18
     fin
 
     muestra(x)

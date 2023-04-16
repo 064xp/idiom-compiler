@@ -8,6 +8,7 @@ import {
 } from "xstate";
 import { CodeGenEvent, generateConditional } from "../jsCodegen";
 import { SymbolTable } from "../syntacticAnalyzer";
+import { assignScopeID, clearScopeSymbols } from "../utils";
 import ConditionMachine, { FinalStateEvent } from "./condition";
 import ProgramMachine, {
     TokenEvent,
@@ -21,6 +22,7 @@ type ConditionalContext = {
     conditionStrings: string[];
     instructionBlocks: string[];
     instructionBuffer: string;
+    scopeID: string;
 };
 
 //@ts-ignore
@@ -38,9 +40,12 @@ const ConditionalMachine = createMachine(
             conditionStrings: [],
             instructionBlocks: [],
             instructionBuffer: "",
+            scopeID: "",
         },
         states: {
             expectCondition: {
+                //@ts-ignore
+                entry: assignScopeID,
                 invoke: {
                     src: () => ConditionMachine,
                     id: "conditionMachine",
@@ -66,7 +71,7 @@ const ConditionalMachine = createMachine(
                         actions: assign({
                             conditionStrings: (c: ConditionalContext, e) => [
                                 ...c.conditionStrings,
-                                (e as CodeGenEvent).result,
+                                (e as unknown as CodeGenEvent).result,
                             ],
                         }),
                     },
@@ -102,6 +107,7 @@ const ConditionalMachine = createMachine(
                     data: {
                         isChild: true,
                         symbolTable: (c: ConditionalContext) => c.symbolTable,
+                        scopeID: (c: ConditionalContext) => c.scopeID,
                     },
                     onDone: {
                         target: "expectInstrOrFin",
@@ -153,7 +159,12 @@ const ConditionalMachine = createMachine(
                 },
             },
             expectElse: {
-                entry: "pushBufferedInstructions",
+                entry: [
+                    "pushBufferedInstructions",
+                    clearScopeSymbols,
+                    assignScopeID,
+                ],
+                //@ts-ignore
                 on: {
                     "si no": "expectEntonces",
                     "si no pero": "expectCondition",
@@ -194,12 +205,15 @@ const ConditionalMachine = createMachine(
             done: {
                 type: "final",
                 data: (c, _) => {
-                    return {
+                    const result = {
                         result: generateConditional(
                             c.conditionStrings,
                             c.instructionBlocks
                         ),
                     };
+
+                    clearScopeSymbols(c);
+                    return result;
                 },
             },
         },

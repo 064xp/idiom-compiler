@@ -12,6 +12,7 @@ type DeclarationContext = {
     identifier?: TokenEvent;
     assignmentString: string;
     symbolTable?: SymbolTable;
+    scopeID: string;
 };
 
 const declarationMachine = createMachine({
@@ -24,6 +25,7 @@ const declarationMachine = createMachine({
     },
     context: {
         assignmentString: "",
+        scopeID: "global"
     },
     states: {
         expectIdentifier: {
@@ -98,7 +100,8 @@ const declarationMachine = createMachine({
                     result: generateDeclaration(
                         c.symbolTable,
                         c.identifier as TokenEvent,
-                        c.assignmentString
+                        c.assignmentString,
+                        c.scopeID
                     ),
                 };
             },

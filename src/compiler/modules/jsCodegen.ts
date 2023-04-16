@@ -83,7 +83,8 @@ export const generateAssignment = (
 export const generateDeclaration = (
     symbolTable: SymbolTable,
     identifier: TokenEvent,
-    assignmentStr: string
+    assignmentStr: string,
+    scopeID: string
 ): string => {
     if (symbolTable.has(identifier.type))
         throw new SemanticError(
@@ -92,7 +93,10 @@ export const generateDeclaration = (
             identifier.col
         );
 
-    symbolTable.set(identifier.type, { type: identifier.tokenType });
+    symbolTable.set(identifier.type, {
+        type: identifier.tokenType,
+        scopeID: scopeID,
+    });
 
     let output = "let";
     if (assignmentStr.length > 0) output += ` ${assignmentStr}`;

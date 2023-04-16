@@ -23,6 +23,11 @@ export type TokenEvent = {
     forwardedByChild: boolean;
 };
 
+export interface ScopedContext {
+    scopeID: string;
+    symbolTable?: SymbolTable;
+}
+
 export type SyntaxMachineOnDone = DoneInvokeEvent<CodeGenResult>;
 
 export type ProgramMachineContext = {
@@ -30,6 +35,7 @@ export type ProgramMachineContext = {
     tempIdentifier?: TokenEvent;
     symbolTable?: SymbolTable;
     generatedString: string;
+    scopeID: string;
 };
 
 export const raiseSyntaxError = (
@@ -75,7 +81,7 @@ const ProgramMachine = createMachine({
         context: {} as ProgramMachineContext,
         events: {} as TokenEvent,
     },
-    context: { isChild: false, generatedString: "" },
+    context: { isChild: false, generatedString: "", scopeID: "global" },
     states: {
         start: {
             entry: assign({
@@ -155,6 +161,7 @@ const ProgramMachine = createMachine({
                 data: {
                     ...DeclarationMachine.initialState.context,
                     symbolTable: (c: ProgramMachineContext) => c.symbolTable,
+                    scopeID: (c: ProgramMachineContext) => c.scopeID,
                 },
             },
         },
@@ -175,7 +182,7 @@ const ProgramMachine = createMachine({
                 onDone: childOnDone,
                 id: "conditionalMachine",
                 autoForward: true,
-                data: { 
+                data: {
                     ...ConditionalMachine.initialState.context,
                     symbolTable: (c: ProgramMachineContext) => c.symbolTable,
                 },
