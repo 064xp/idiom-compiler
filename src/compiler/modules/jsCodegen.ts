@@ -227,14 +227,21 @@ export const generateFunctionCall = (
             functionName.col
         );
 
-    if (symbolTable.get(functionName.type)!.type !== "function")
+    const tokenType = symbolTable.get(functionName.type)!.type;
+    if (tokenType !== "function" && tokenType !== "builtinFunction")
         throw new SemanticError(
             `El identificador "${functionName.type}" no es una función`,
             functionName.row,
             functionName.col
         );
 
-    let output = `${functionName.type}(`;
+    let output = "";
+
+    // If it's a builtin function, call from the builtin module
+    if (tokenType === "builtinFunction")
+        output = `builtin.${functionName.type}(`;
+    else 
+        output = `${functionName.type}(`;
 
     parameters.forEach((p, i) => {
         if (p.tokenType === "identifier" && !symbolTable.has(p.type))

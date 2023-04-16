@@ -7,6 +7,7 @@ import SyntaxAnalyzer, { SyntaxError } from "./modules/syntacticAnalyzer";
 const compile = (input: string): string => {
     const lexer = new LexicalAnalyzer(input);
     const syntaxAnalyzer = new SyntaxAnalyzer();
+    let code: string | null = "";
 
     let token: Token;
 
@@ -14,8 +15,8 @@ const compile = (input: string): string => {
         token = lexer.getToken();
 
         console.log(`parsing token: ${JSON.stringify(token.token)} (${token.type})`);
-        syntaxAnalyzer.parseToken(token);
-        if (token.type === "eof") break;
+        code = syntaxAnalyzer.parseToken(token);
+        if (code !== null) break;
     }
     // Commenting error handling for development
     // try {
@@ -32,7 +33,7 @@ const compile = (input: string): string => {
     //         console.log("Error ocurred", e);
     //     }
     // }
-    return "";
+    return code as string;
 };
 
 export const compileTest = () => {
@@ -63,7 +64,7 @@ export const compileTest = () => {
         declara repiteABC asigna 1 mas testing modulo 5
     fin
 
-    declara x asigna 2
+    declara x asigna "hola mundo!"
     declara yo asigna 100
 
     si x mayor que 3 o yo menor que 25 entonces
@@ -86,7 +87,7 @@ export const compileTest = () => {
 
     muestra(x)
     `
-    compile(p);
+    return compile(p);
 };
 
 export default compile;

@@ -40,13 +40,13 @@ export default class SyntaxAnalyzer {
         Object.keys(stdLib).forEach((key) => {
             if (typeof stdLib[key as keyof typeof stdLib] === "function")
                 this.#symbolTable.set(key, {
-                    type: "function",
+                    type: "builtinFunction",
                     scopeID: "global",
                 });
         });
     }
 
-    parseToken(token: Token) {
+    parseToken(token: Token): string | null {
         this.#lastToken = token;
         const obj: TokenEvent = {
             type: token.token,
@@ -79,9 +79,11 @@ export default class SyntaxAnalyzer {
 
             console.log(generatedCode);
             console.log(this.#symbolTable);
+            return generatedCode;
         }
 
         this.#lastToken = token;
+        return null;
     }
 
     /**
