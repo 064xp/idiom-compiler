@@ -1,9 +1,9 @@
-import React, { ForwardRefExoticComponent, useRef } from "react";
+import React, { useRef } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import styles from "./EditorPane.module.css";
 import { options, tokensProvider, conf, theme } from "../../config/monaco";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
-import OutputPanel from "../OutputPanel/OutputPanel";
+import OutputPanel, { OutputPanelHandle } from "../OutputPanel/OutputPanel";
 
 interface IProps {
     currentFile: EditorFile;
@@ -11,7 +11,7 @@ interface IProps {
         value: string | undefined,
         ev: monaco.editor.IModelContentChangedEvent
     ) => void;
-    outputPanelRef: ForwardRefExoticComponent<typeof OutputPanel>;
+    outputPanelRef: React.Ref<OutputPanelHandle>;
 }
 
 const EditorPane = ({

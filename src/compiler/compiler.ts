@@ -1,18 +1,23 @@
-import LexicalAnalyzer, {
-    LexicalError,
-    Token,
-} from "./modules/lexicalAnalyzer";
-import SyntaxAnalyzer  from "./modules/syntacticAnalyzer";
+import LexicalAnalyzer, { Token } from "./modules/lexicalAnalyzer";
+import SyntaxAnalyzer from "./modules/syntacticAnalyzer";
 import IdiomRuntime from "./runtime";
 
-type CompilerErrorType = "Error Semántico" | "Error Sintáctico" | "Error Léxico";
+type CompilerErrorType =
+    | "Error Semántico"
+    | "Error Sintáctico"
+    | "Error Léxico";
 
 export class IdiomCompilerError extends Error {
     row: number;
     col: number;
     type: CompilerErrorType;
 
-    constructor(type: CompilerErrorType, message: string, row: number, col: number) {
+    constructor(
+        type: CompilerErrorType,
+        message: string,
+        row: number,
+        col: number
+    ) {
         super();
         this.message = message;
         this.row = row;
@@ -21,10 +26,9 @@ export class IdiomCompilerError extends Error {
     }
 }
 
-
 export type CompilerError = {
-    type: CompilerErrorType
-}
+    type: CompilerErrorType;
+};
 
 const compile = (input: string): string => {
     const lexer = new LexicalAnalyzer(input);
@@ -45,7 +49,6 @@ const compile = (input: string): string => {
         }
         // Commenting error handling for development
     } catch (e) {
-
         if (e instanceof IdiomCompilerError) {
             IdiomRuntime.writeStderr(e);
         } else {

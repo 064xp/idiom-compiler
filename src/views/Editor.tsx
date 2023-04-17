@@ -1,4 +1,4 @@
-import React, { useState, useRef, ForwardRefExoticComponent } from "react";
+import React, { useState, useRef } from "react";
 import compile from "../compiler/compiler";
 import IdiomRuntime from "../compiler/runtime";
 import EditorPane from "../components/EditorPane/EditorPane";
@@ -70,7 +70,6 @@ const Editor = () => {
             <EditorPane
                 currentFile={files[currentFile]}
                 onEditorChange={onEditorChange}
-                //@ts-ignore
                 outputPanelRef={outputPanelRef}
             />
             <a href="" ref={downloadRef} style={{ display: "none" }}></a>
