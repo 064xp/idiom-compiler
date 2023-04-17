@@ -122,8 +122,9 @@ export const generateLoop = (
         );
 
     if (
-        (iterations.tokenType === "identifier" &&
-            symbolTable.get(iterations.type)!.type !== "numberLiteral") ||
+        // (iterations.tokenType === "identifier" &&
+        //     symbolTable.get(iterations.type)!.type !== "numberLiteral") ||
+        iterations.tokenType !== "identifier" &&
         iterations.tokenType !== "numberLiteral"
     )
         throw new SemanticError(
@@ -133,7 +134,7 @@ export const generateLoop = (
         );
 
     let output = `
-        for(let i=0; i<${parseInt(iterations.type)}; i++){
+        for(let i=0; i<${iterations.type}; i++){
             ${instructionsString}
         }
         `;

@@ -134,7 +134,7 @@ const ProgramMachine = createMachine({
                 src: AssignmentMachine,
                 autoForward: true,
                 data: {
-                    ...DeclarationMachine.initialState.context,
+                    ...AssignmentMachine.initialState.context,
                     identifier: (c: ProgramMachineContext) => c.tempIdentifier,
                     symbolTable: (c: ProgramMachineContext) => c.symbolTable,
                 },

@@ -1,3 +1,4 @@
+import { SemanticError } from "./modules/jsCodegen";
 import LexicalAnalyzer, {
     LexicalError,
     Token,
@@ -11,28 +12,34 @@ const compile = (input: string): string => {
 
     let token: Token;
 
-    while (true) {
-        token = lexer.getToken();
+    try {
+        while (true) {
+            token = lexer.getToken();
 
-        console.log(`parsing token: ${JSON.stringify(token.token)} (${token.type})`);
-        code = syntaxAnalyzer.parseToken(token);
-        if (code !== null) break;
+            console.log(
+                `parsing token: ${JSON.stringify(token.token)} (${token.type})`
+            );
+            code = syntaxAnalyzer.parseToken(token);
+            if (code !== null) break;
+        }
+        // Commenting error handling for development
+    } catch (e) {
+        if (e instanceof LexicalError) {
+            console.log(
+                `lex error: ${e.message}, row: ${e.row}, col: ${e.col}`
+            );
+        } else if (e instanceof SyntaxError) {
+            console.log(
+                `syntax error: ${e.message}, row: ${e.row}, col: ${e.col}`
+            );
+        } else if (e instanceof SemanticError) {
+            console.log(
+                `semantic error: ${e.message}, row: ${e.row}, col: ${e.col}`
+            );
+        } else {
+            console.log("Error ocurred", e);
+        }
     }
-    // Commenting error handling for development
-    // try {
-    // } catch (e) {
-    //     if (e instanceof LexicalError) {
-    //         console.log(
-    //             `lex error: ${e.message}, row: ${e.row}, col: ${e.col}`
-    //         );
-    //     } else if (e instanceof SyntaxError) {
-    //         console.log(
-    //             `syntax error: ${e.message}, row: ${e.row}, col: ${e.col}`
-    //         );
-    //     } else {
-    //         console.log("Error ocurred", e);
-    //     }
-    // }
     return code as string;
 };
 
@@ -49,7 +56,7 @@ export const compileTest = () => {
     // const p = `
     // repite 3 veces
     //     si x mayor que 10 entonces
-    //         declara a 
+    //         declara a
     //     fin
     //     si no pero xx entonces
     //         declara b
@@ -86,7 +93,7 @@ export const compileTest = () => {
     fin
 
     muestra(x)
-    `
+    `;
     return compile(p);
 };
 
