@@ -5,7 +5,6 @@ repite 20 veces
     declara modulo3 asigna i modulo 3
     declara modulo5 asigna i modulo 5
 
-    muestra(i)
     si modulo3 igual que 0 y modulo5 igual que 0 entonces
         muestra("Fizz Buzz")
     fin
@@ -14,6 +13,9 @@ repite 20 veces
     fin
     si no pero modulo5 igual que 0 entonces
         muestra("Buzz")
+    fin
+    si no entonces
+        muestra(i)
     fin
 
     i asigna i mas 1
