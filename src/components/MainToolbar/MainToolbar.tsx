@@ -13,9 +13,10 @@ interface HTMLInputEvent extends React.FormEvent<HTMLInputElement> {
 interface IProps {
   onFileOpen: (file: EditorFile) => void;
   onDownloadClick: () => void;
+  onRunClick: () => void;
 }
 
-const MainToolbar = ({ onFileOpen, onDownloadClick }: IProps) => {
+const MainToolbar = ({ onFileOpen, onDownloadClick, onRunClick }: IProps) => {
   const onFileInputChanged: React.FormEventHandler<HTMLInputElement> = (
     event: HTMLInputEvent
   ) => {
@@ -45,6 +46,7 @@ const MainToolbar = ({ onFileOpen, onDownloadClick }: IProps) => {
         icon={RunIcon}
         size="5.2em"
         className={styles.mainButtons}
+        onClick={onRunClick}
       />
       <CircularButton
         icon={LoadIcon}

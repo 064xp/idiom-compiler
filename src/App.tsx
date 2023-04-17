@@ -5,11 +5,6 @@ import { useEffect } from "react";
 import IdiomRuntime from "./compiler/runtime";
 
 function App() {
-    useEffect(() => {
-        console.log("----------------------------------");
-        const code = compileTest();
-        IdiomRuntime.runCode(code)
-    }, []);
     return (
         <div className="App">
             <Editor />

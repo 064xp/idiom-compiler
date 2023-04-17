@@ -6,12 +6,12 @@ export const muestra = (obj: MuestraParams) => {
     switch(typeof obj) {
         case "number":
         case "boolean":
-            IdiomRuntime.stdout = obj.toString();
+            IdiomRuntime.writeStdout(obj.toString());
             break;
         case "string":
-            IdiomRuntime.stdout = obj;
+            IdiomRuntime.writeStdout(obj);
             break;
         default: 
-            IdiomRuntime.stdout = JSON.stringify(obj);
+            IdiomRuntime.writeStdout(JSON.stringify(obj));
     }
 }
