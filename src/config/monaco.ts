@@ -166,10 +166,10 @@ export const conf: languages.LanguageConfiguration = {
     ],
     folding: {
         offSide: true,
-        // markers: {
-        //     start: new RegExp("^\\s*#region\\b"),
-        //     end: new RegExp("^\\s*#endregion\\b"),
-        // },
+        markers: {
+            start: new RegExp("veces\\b|entonces\\b"),
+            end: new RegExp("fin\\b"),
+        },
     },
 };
 

@@ -4,8 +4,11 @@ import React, {
     useImperativeHandle,
     useState,
 } from "react";
+import { IdiomCompilerError } from "../../compiler/compiler";
 import IdiomRuntime from "../../compiler/runtime";
 import styles from "./OutputPanel.module.css";
+
+import ErrorIcon from "../../assets/circle-exclamation-solid.svg";
 
 interface OutputPanelProps {}
 
@@ -14,14 +17,17 @@ export interface OutputPanelHandle {
 }
 
 const OutputPanel = forwardRef<OutputPanelHandle, OutputPanelProps>(
-    (props, ref) => {
+    (_, ref) => {
         const [outputMessages, setOutputMessages] = useState<string[]>([]);
+        const [error, setError] = useState<IdiomCompilerError | null>(null);
 
         useEffect(() => {
             IdiomRuntime.subscribeStdoutChange(onStdoutChange);
+            IdiomRuntime.subscribeStderrChange(onNewError);
 
             return () => {
                 IdiomRuntime.unsubscribeStdoutChange(onStdoutChange);
+                IdiomRuntime.unsubscribeStderrChange(onNewError);
             };
         }, []);
 
@@ -30,8 +36,8 @@ const OutputPanel = forwardRef<OutputPanelHandle, OutputPanelProps>(
             () => {
                 return {
                     clearOutput: () => {
-                        console.log('clearing output')
                         setOutputMessages([]);
+                        setError(null);
                     },
                 };
             },
@@ -39,12 +45,31 @@ const OutputPanel = forwardRef<OutputPanelHandle, OutputPanelProps>(
         );
 
         const onStdoutChange = (value: string) => {
-            console.log("stdout changed", value);
             setOutputMessages((outputMessages) => [...outputMessages, value]);
+        };
+
+        const onNewError = (value: IdiomCompilerError) => {
+            console.log("got error", value);
+            setError(value);
         };
 
         return (
             <div className={styles.container}>
+                {error && (
+                    <div className={styles.errorContainer}>
+                        <img src={ErrorIcon} className={styles.errorIcon} />
+                        <div>
+                            <h2 className={styles.errorType}>{error.type}</h2>
+                            <p className={styles.errorMessage}>
+                                {error.message}
+                            </p>
+                            <p className={styles.errorLocation}>
+                                Línea {error.row}, caracter {error.col}
+                            </p>
+                        </div>
+                    </div>
+                )}
+
                 {outputMessages.map((m, i) => (
                     <div key={i}>
                         <p>{m}</p>

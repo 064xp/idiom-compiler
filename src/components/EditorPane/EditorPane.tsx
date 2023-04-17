@@ -1,4 +1,4 @@
-import React, { RefObject, useRef } from "react";
+import React, { ForwardRefExoticComponent, useRef } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import styles from "./EditorPane.module.css";
 import { options, tokensProvider, conf, theme } from "../../config/monaco";
@@ -11,10 +11,14 @@ interface IProps {
         value: string | undefined,
         ev: monaco.editor.IModelContentChangedEvent
     ) => void;
-    outputPanelRef: RefObject<typeof OutputPanel>
+    outputPanelRef: ForwardRefExoticComponent<typeof OutputPanel>;
 }
 
-const EditorPane = ({ currentFile, onEditorChange, outputPanelRef}: IProps) => {
+const EditorPane = ({
+    currentFile,
+    onEditorChange,
+    outputPanelRef,
+}: IProps) => {
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
     const handleEditorDidMount = (
@@ -44,7 +48,7 @@ const EditorPane = ({ currentFile, onEditorChange, outputPanelRef}: IProps) => {
                 onChange={onEditorChange}
             />
             <div className={styles.outputPanel}>
-                <OutputPanel ref={outputPanelRef}/>
+                <OutputPanel ref={outputPanelRef} />
             </div>
         </div>
     );

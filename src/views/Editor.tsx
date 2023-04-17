@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, ForwardRefExoticComponent } from "react";
 import compile from "../compiler/compiler";
 import IdiomRuntime from "../compiler/runtime";
 import EditorPane from "../components/EditorPane/EditorPane";
@@ -7,7 +7,7 @@ import { OutputPanelHandle } from "../components/OutputPanel/OutputPanel";
 import TabBar from "../components/TabBar/TabBar";
 import initialProgram from "../config/initialProgram";
 
-import styles from "./Editor.module.css"
+import styles from "./Editor.module.css";
 
 const Editor = () => {
     const [files, setFiles] = useState<OpenFiles>([initialProgram]);
@@ -48,13 +48,12 @@ const Editor = () => {
     };
 
     const runCode = () => {
-        const code = compile(files[currentFile].value);
-
-        if(outputPanelRef.current !== null)
+        if (outputPanelRef.current !== null)
             outputPanelRef.current.clearOutput();
 
-        IdiomRuntime.runCode(code)
-    }
+        const code = compile(files[currentFile].value);
+        IdiomRuntime.runCode(code);
+    };
 
     return (
         <div className={styles.container}>
@@ -71,6 +70,7 @@ const Editor = () => {
             <EditorPane
                 currentFile={files[currentFile]}
                 onEditorChange={onEditorChange}
+                //@ts-ignore
                 outputPanelRef={outputPanelRef}
             />
             <a href="" ref={downloadRef} style={{ display: "none" }}></a>

@@ -3,4 +3,36 @@
     height: 100%;
     overflow-y: scroll;
     color: black;
+    background: #2f3640;
+    padding: 1em;
+}
+
+.errorContainer {
+    width: 100%;
+    color: black;
+    background-color: #b33939;
+    padding: 1em;
+    box-sizing: border-box;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.errorIcon {
+    height: 3.5em;
+    margin: 0 1.1em 0 0;
+}
+
+.errorType {
+    margin: 0;
+}
+
+.errorMessage {
+    margin: 0.5em 0 0 0;
+    font-size: 1.3em;
+}
+
+.errorLocation {
+    margin: 0.5em 0 0 0;
 }
