@@ -1,18 +1,22 @@
 const initialProgram = `
-declara texto asigna "Hola Mundo!"
-declara num1 asigna 2
-declara num2 asigna 5
-declara num3
+declara i asigna 1
 
-si num1 mayor que num2 entonces
-	num3 asigna num1 mas num2
-fin
-si no entonces
-	num3 asigna num1 por num2
-fin
+repite 20 veces
+    declara modulo3 asigna i modulo 3
+    declara modulo5 asigna i modulo 5
 
-repite num3 veces
-	muestra(texto)
+    muestra(i)
+    si modulo3 igual que 0 y modulo5 igual que 0 entonces
+        muestra("Fizz Buzz")
+    fin
+    si no pero modulo3 igual que 0 entonces
+        muestra("Fizz")
+    fin
+    si no pero modulo5 igual que 0 entonces
+        muestra("Buzz")
+    fin
+
+    i asigna i mas 1
 fin
 `;
 

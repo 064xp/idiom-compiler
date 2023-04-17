@@ -56,7 +56,10 @@ const OutputPanel = forwardRef<OutputPanelHandle, OutputPanelProps>(
         return (
             <div className={styles.container}>
                 {error && (
-                    <div className={styles.errorContainer}>
+                    <div
+                        className={`${styles.outputMessageContainer} 
+                            ${styles.errorContainer}`}
+                    >
                         <img src={ErrorIcon} className={styles.errorIcon} />
                         <div>
                             <h2 className={styles.errorType}>{error.type}</h2>
@@ -71,8 +74,12 @@ const OutputPanel = forwardRef<OutputPanelHandle, OutputPanelProps>(
                 )}
 
                 {outputMessages.map((m, i) => (
-                    <div key={i}>
-                        <p>{m}</p>
+                    <div
+                        key={i}
+                        className={`${styles.outputMessageContainer} 
+                            ${styles.messageContainer}`}
+                    >
+                        <p className={styles.messageText}>{m}</p>
                     </div>
                 ))}
             </div>

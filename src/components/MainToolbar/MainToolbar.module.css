@@ -1,24 +1,24 @@
 .container {
-  background-color: var(--background-accent);
-  padding: 0.6em 1em;
-  display: flex;
-  align-items: center;
-  box-shadow: 0px 7px 18px -6px rgba(0, 0, 0, 0.69);
-  -webkit-box-shadow: 0px 7px 18px -6px rgba(0, 0, 0, 0.69);
-  -moz-box-shadow: 0px 7px 18px -6px rgba(0, 0, 0, 0.69);
-  position: relative;
-  z-index: 10;
+    background-color: var(--background-accent);
+    padding: 0.6em 1em;
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+    box-shadow: 1px 3px 26px -4px rgba(0,0,0,0.33);
+    -webkit-box-shadow: 1px 3px 26px -4px rgba(0,0,0,0.33);
+    -moz-box-shadow: 1px 3px 26px -4px rgba(0,0,0,0.33);
 }
 
 .container .mainButtons {
-  margin: 0 1em;
+    margin: 0 1em;
 }
 
 .mainButtons {
-  position: relative;
-  z-index: 9;
+    position: relative;
+    z-index: 9;
 }
 
 .container button:first-child {
-  margin-left: 0;
+    margin-left: 0;
 }

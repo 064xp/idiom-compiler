@@ -5,16 +5,20 @@
     color: black;
     background: #2f3640;
     padding: 1em;
+    box-sizing: border-box;
 }
 
-.errorContainer {
+.outputMessageContainer {
     width: 100%;
-    color: black;
-    background-color: #b33939;
     padding: 1em;
     box-sizing: border-box;
     border-radius: 4px;
     display: flex;
+}
+
+.errorContainer {
+    color: black;
+    background-color: #b33939;
     flex-direction: row;
     align-items: center;
 }
@@ -35,4 +39,17 @@
 
 .errorLocation {
     margin: 0.5em 0 0 0;
+}
+
+.messageContainer {
+    background-color: #22282f;
+    color: white;
+    margin: 0 0 0.4em 0;
+    /* padding-top: .4em; */
+    /* padding-bottom: .4em; */
+}
+
+.messageText {
+    font-size: 1.3em;
+    margin: 0;
 }

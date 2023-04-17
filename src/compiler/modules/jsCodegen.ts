@@ -1,6 +1,7 @@
 import { IdiomCompilerError } from "../compiler";
 import { SymbolTable } from "./syntacticAnalyzer";
 import { TokenEvent } from "./syntaxMachines/programMachine";
+import { getRandomID } from "./utils";
 
 export type CodeGenResult = {
     result: string;
@@ -58,7 +59,7 @@ export const generateAssignment = (
             case "arithmeticOperator":
                 output +=
                     arithmeticOperatorMap[
-                    token.type as keyof typeof arithmeticOperatorMap
+                        token.type as keyof typeof arithmeticOperatorMap
                     ];
                 break;
             default:
@@ -127,8 +128,10 @@ export const generateLoop = (
             iterations.col
         );
 
+    const incrementor = getRandomID(10);
+
     let output = `
-        for(let i=0; i<${iterations.type}; i++){
+        for(let ${incrementor}=0; ${incrementor}<${iterations.type}; ${incrementor}++){
             ${instructionsString}
         }
         `;
@@ -163,13 +166,13 @@ export const generateCondition = (
             case "comparisonOperator":
                 output +=
                     comparisonOperatorMap[
-                    token.type as keyof typeof comparisonOperatorMap
+                        token.type as keyof typeof comparisonOperatorMap
                     ];
                 break;
             case "logicalOperator":
                 output +=
                     logicalOperatorMap[
-                    token.type as keyof typeof logicalOperatorMap
+                        token.type as keyof typeof logicalOperatorMap
                     ];
                 break;
             default:
