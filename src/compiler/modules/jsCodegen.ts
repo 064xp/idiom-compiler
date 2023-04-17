@@ -1,16 +1,6 @@
+import { IdiomCompilerError } from "../compiler";
 import { SymbolTable } from "./syntacticAnalyzer";
 import { TokenEvent } from "./syntaxMachines/programMachine";
-
-export class SemanticError extends Error {
-    row: number;
-    col: number;
-    constructor(message: string, row: number, col: number) {
-        super();
-        this.message = message;
-        this.row = row;
-        this.col = col;
-    }
-}
 
 export type CodeGenResult = {
     result: string;
@@ -54,7 +44,8 @@ export const generateAssignment = (
         switch (token.tokenType) {
             case "identifier":
                 if (!symbolTable.has(token.type)) {
-                    throw new SemanticError(
+                    throw new IdiomCompilerError(
+                        "Error Semántico",
                         `Se intentó acceder a variable "${token.type}" no existente`,
                         token.row,
                         token.col
@@ -87,7 +78,8 @@ export const generateDeclaration = (
     scopeID: string
 ): string => {
     if (symbolTable.has(identifier.type))
-        throw new SemanticError(
+        throw new IdiomCompilerError(
+            "Error Semántico",
             `Se intentó declarar una variable ya existente "${identifier.type}"`,
             identifier.row,
             identifier.col
@@ -115,7 +107,8 @@ export const generateLoop = (
         iterations.tokenType === "identifier" &&
         !symbolTable.has(iterations.type)
     )
-        throw new SemanticError(
+        throw new IdiomCompilerError(
+            "Error Semántico",
             `La variable "${iterations.type}" no existe`,
             iterations.row,
             iterations.col
@@ -127,7 +120,8 @@ export const generateLoop = (
         iterations.tokenType !== "identifier" &&
         iterations.tokenType !== "numberLiteral"
     )
-        throw new SemanticError(
+        throw new IdiomCompilerError(
+            "Error Semántico",
             `El valor de ciclo "${iterations.type}" debe ser un número`,
             iterations.row,
             iterations.col
@@ -152,7 +146,8 @@ export const generateCondition = (
         switch (token.tokenType) {
             case "identifier":
                 if (!symbolTable.has(token.type))
-                    throw new SemanticError(
+                    throw new IdiomCompilerError(
+                        "Error Semántico",
                         `Variable no existente "${token.type}"`,
                         token.row,
                         token.col
@@ -222,7 +217,8 @@ export const generateFunctionCall = (
     functionName: TokenEvent
 ): string => {
     if (!symbolTable.has(functionName.type))
-        throw new SemanticError(
+        throw new IdiomCompilerError(
+            "Error Semántico",
             `La función "${functionName.type}" no existe`,
             functionName.row,
             functionName.col
@@ -230,7 +226,8 @@ export const generateFunctionCall = (
 
     const tokenType = symbolTable.get(functionName.type)!.type;
     if (tokenType !== "function" && tokenType !== "builtinFunction")
-        throw new SemanticError(
+        throw new IdiomCompilerError(
+            "Error Semántico",
             `El identificador "${functionName.type}" no es una función`,
             functionName.row,
             functionName.col
@@ -241,12 +238,12 @@ export const generateFunctionCall = (
     // If it's a builtin function, call from the builtin module
     if (tokenType === "builtinFunction")
         output = `builtin.${functionName.type}(`;
-    else 
-        output = `${functionName.type}(`;
+    else output = `${functionName.type}(`;
 
     parameters.forEach((p, i) => {
         if (p.tokenType === "identifier" && !symbolTable.has(p.type))
-            throw new SemanticError(
+            throw new IdiomCompilerError(
+                "Error Semántico",
                 `El parámetro "${p.type}" para la función ${functionName.type} no existe`,
                 p.row,
                 p.col

@@ -5,9 +5,10 @@ import {
     send,
     sendParent,
 } from "xstate";
+import { IdiomCompilerError } from "../../compiler";
 import { CodeGenResult } from "../jsCodegen";
 import { TokenType } from "../lexicalAnalyzer";
-import { SyntaxError, SymbolTable } from "../syntacticAnalyzer";
+import { SymbolTable } from "../syntacticAnalyzer";
 
 import AssignmentMachine from "./assignment";
 import ConditionalMachine from "./conditional";
@@ -47,7 +48,7 @@ export const raiseSyntaxError = (
     let msg = message;
 
     if (showGot) msg += `, se obtuvo ${JSON.stringify(event.type)}`;
-    throw new SyntaxError(msg, event.row, event.col);
+    throw new IdiomCompilerError("Error Sintáctico", msg, event.row, event.col);
 };
 
 const childOnDone = [

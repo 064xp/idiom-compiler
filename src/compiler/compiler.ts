@@ -1,9 +1,30 @@
-import { SemanticError } from "./modules/jsCodegen";
 import LexicalAnalyzer, {
     LexicalError,
     Token,
 } from "./modules/lexicalAnalyzer";
-import SyntaxAnalyzer, { SyntaxError } from "./modules/syntacticAnalyzer";
+import SyntaxAnalyzer  from "./modules/syntacticAnalyzer";
+import IdiomRuntime from "./runtime";
+
+type CompilerErrorType = "Error Semántico" | "Error Sintáctico" | "Error Léxico";
+
+export class IdiomCompilerError extends Error {
+    row: number;
+    col: number;
+    type: CompilerErrorType;
+
+    constructor(type: CompilerErrorType, message: string, row: number, col: number) {
+        super();
+        this.message = message;
+        this.row = row;
+        this.col = col;
+        this.type = type;
+    }
+}
+
+
+export type CompilerError = {
+    type: CompilerErrorType
+}
 
 const compile = (input: string): string => {
     const lexer = new LexicalAnalyzer(input);
@@ -24,20 +45,11 @@ const compile = (input: string): string => {
         }
         // Commenting error handling for development
     } catch (e) {
-        if (e instanceof LexicalError) {
-            console.log(
-                `lex error: ${e.message}, row: ${e.row}, col: ${e.col}`
-            );
-        } else if (e instanceof SyntaxError) {
-            console.log(
-                `syntax error: ${e.message}, row: ${e.row}, col: ${e.col}`
-            );
-        } else if (e instanceof SemanticError) {
-            console.log(
-                `semantic error: ${e.message}, row: ${e.row}, col: ${e.col}`
-            );
+
+        if (e instanceof IdiomCompilerError) {
+            IdiomRuntime.writeStderr(e);
         } else {
-            console.log("Error ocurred", e);
+            console.log("Caught error in compiler", e);
         }
     }
     return code as string;

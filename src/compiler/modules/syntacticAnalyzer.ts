@@ -5,24 +5,14 @@ import ProgramMachine, {
     TokenEvent,
 } from "./syntaxMachines/programMachine";
 import * as stdLib from "../standardLibrary";
-
-export class SyntaxError extends Error {
-    row: number;
-    col: number;
-    constructor(message: string, row: number, col: number) {
-        super();
-        this.message = message;
-        this.row = row;
-        this.col = col;
-    }
-}
+import { IdiomCompilerError } from "../compiler";
 
 export type SymbolTable = Map<string, { type: TokenType; scopeID: string }>;
 
 export default class SyntaxAnalyzer {
     #service;
     #lastToken: Token | undefined;
-    #symbolTable: SymbolTable = new Map<string, { type: TokenType }>();
+    #symbolTable: SymbolTable = new Map();
 
     constructor() {
         this.#initializeSymbolTable();
@@ -66,8 +56,9 @@ export default class SyntaxAnalyzer {
             // throw error
             const ss = this.#service.getSnapshot();
             if (!ss.done && ss.value !== "start") {
-                throw new SyntaxError(
-                    "Incomplete statement",
+                throw new IdiomCompilerError(
+                    "Error Sintáctico",
+                    "Programa Incompleto",
                     this.#lastToken?.row as number,
                     this.#lastToken?.col as number
                 );
