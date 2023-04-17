@@ -239,8 +239,7 @@ export const generateFunctionCall = (
     let output = "";
 
     // If it's a builtin function, call from the builtin module
-    if (tokenType === "builtinFunction")
-        output = `builtin.${functionName.type}(`;
+    if (tokenType === "builtinFunction") output = `this.${functionName.type}(`;
     else output = `${functionName.type}(`;
 
     parameters.forEach((p, i) => {

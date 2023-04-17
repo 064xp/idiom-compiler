@@ -14,8 +14,8 @@ export default class IdiomRuntime {
     static #stderrListeners: StderrChangeListener[] = [];
 
     static runCode = (code: string) => {
-        const builtin = _builtin;
-        eval(code);
+        const func = new Function(code).bind(_builtin);
+        func();
     };
 
     // Stdout
