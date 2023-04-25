@@ -1,8 +1,13 @@
 const initialProgram = `
+## Bienvenid@ a Idiom!
+
+# Fizz Buzz!
 declara i asigna 1
 
 repite 20 veces
+    # 0 si es divisible entre 3
     declara modulo3 asigna i modulo 3
+    # 0 si es divisible entre 5
     declara modulo5 asigna i modulo 5
 
     si modulo3 igual que 0 y modulo5 igual que 0 entonces
@@ -18,6 +23,7 @@ repite 20 veces
         muestra(i)
     fin
 
+    # incrementa i
     i asigna i mas 1
 fin
 `;

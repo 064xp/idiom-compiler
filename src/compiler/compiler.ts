@@ -1,4 +1,5 @@
 import LexicalAnalyzer, { Token } from "./modules/lexicalAnalyzer";
+import Preprocessor from "./modules/preprocessor";
 import SyntaxAnalyzer from "./modules/syntacticAnalyzer";
 import IdiomRuntime from "./runtime";
 
@@ -31,6 +32,9 @@ export type CompilerError = {
 };
 
 const compile = (input: string): string => {
+    const preprocessor = new Preprocessor();
+    input = preprocessor.run(input);
+    console.log("input after preprocessor", input);
     const lexer = new LexicalAnalyzer(input);
     const syntaxAnalyzer = new SyntaxAnalyzer();
     let code: string | null = "";

@@ -1,3 +1,5 @@
+import { IdiomCompilerError } from "../compiler";
+
 export type TokenType =
     | "reserved"
     | "identifier"
@@ -93,17 +95,6 @@ const tokenPatterns: TokenPattern[] = [
     { type: "identifier", regex: "[A-Za-z_][\\w_]*" },
 ];
 
-export class LexicalError extends Error {
-    row: number;
-    col: number;
-    constructor(message: string, row: number, col: number) {
-        super();
-        this.message = message;
-        this.row = row;
-        this.col = col;
-    }
-}
-
 export default class LexicalAnalyzer {
     #inputString: string = "";
     #row: number = 1;
@@ -116,7 +107,7 @@ export default class LexicalAnalyzer {
     /**
      *
      * @returns Next token in the program input or null if end of program
-     * @throws {LexicalError}
+     * @throws {IdiomCompilerError}
      */
     getToken(): Token {
         if (this.#inputString.length === 0)
@@ -156,7 +147,8 @@ export default class LexicalAnalyzer {
         }
 
         const unknownToken = this.#getFirstWord(this.#inputString);
-        throw new LexicalError(
+        throw new IdiomCompilerError(
+            "Error Léxico",
             `Token no esperado: "${unknownToken}"`,
             this.#row,
             this.#col
